@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kids Worksheet Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap');
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      .font-comic {
+        font-family: 'Comic Neue', cursive;
+      }
+      .trace-text {
+        color: #d1d5db; /* gray-300 */
+        border-bottom: 2px dashed #9ca3af; /* gray-400 */
+        letter-spacing: 0.5em;
+      }
+
+      /* Theme Backgrounds */
+      .theme-space {
+        background-color: #f0f4f8;
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNmMGY0ZjgiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjMwIiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTUwIDYwIEw1MiA1OCBMNTAgNTYgTDUyIDU4IFoiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjIwIiByPSIxLjUiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI3MCIgY3k9IjgwIiByPSIzIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTMwIDgwIEwzMiA3OCBMMzAgNzYgTDMyIDc4IFoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=');
+      }
+      .theme-ocean {
+        background-color: #e0f2fe;
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlMGYyZmUiLz48cGF0aCBkPSJNMCAyMCBDIDI1IDAgNTAgNDAgNzUgMjAgQyAxMDAgMCAxMDAgMjAgMTAwIDIwIFYgMTAwIEggMCBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNiZmU2ZjIiIHN0cm9rZS1widthD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIvPjxwYXRoIGQ9Ik0wIDUwIEMgMjUgMzAgNTAgNzAgNzUgNTAgQyAxMDAgMzAgMTAwIDUwIDEwMCA1MCBWIDEwMCBIIDAgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYmZlNmYyIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1vcGFjaXR5PSIwLjUiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjgwIiByPSIzIiBmaWxsPSIjYmZlNmYyIiBvcGFjaXR5PSIwLjUiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjQwIiByPSIyIiBmaWxsPSIjYmZlNmYyIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=');
+      }
+      .theme-garden {
+        background-color: #f0fdf4;
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNmMGZkZjQiLz48cGF0aCBkPSJNNTAgODAgQzQwIDgwIDQwIDcwIDUwIDcwIEM2MCA3MCA2MCA4MCA1MCA4MCBaIiBmaWxsPSIjOGZjYTg2IiBvcGFjaXR5PSIwLjciLz48cGF0aCBkPSJNNTAgNzIgQzQ4IDcyIDQ4IDY4IDUwIDY4IEM1MiA2OCA1MiA3MiA1MCA3MiBaIiBmaWxsPSIjZjllNDc4IiBvcGFjaXR5PSIwLjciLz48cGF0aCBkPSJNMjAgNDAgQzEwIDQwIDEwIDMwIDIwIDMwIEMzMCAzMCAzMCA0MCAyMCA0MCBaIiBmaWxsPSIjOGZjYTg2IiBvcGFjaXR5PSIwLjciLz48cGF0aCBkPSJNMjAgMzIgQzE4IDMyIDE4IDI4IDIwIDI4IEMyMiAyOCAyMiAzMiAyMCAzMiBaIiBmaWxsPSIjZjllNDc4IiBvcGFjaXR5PSIwLjciLz48cGF0aCBkPSJNNCA2MCBDNzAgNjAgNzAgNTAgODAgNTAgQzkAgNTAgOTAgNjAgODAgNjAgWiIgZmlsbD0iIzhmY2E4NiIgb3BhY2l0eT0iMC43Ii8+PHBhdGggZD0iTTgwIDUyIEM3OCA1MiA3OCA0OCA4MCA0OCBDODIgNDggODIgNTIgODAgNTIgWiIgZmlsbD0iI2Y5ZTQ3OCIgb3BhY2l0eT0iMC43Ii8+PC9zdmc+');
+      }
+
+      @media print {
+        body {
+          margin: 0;
+          padding: 0;
+        }
+        .no-print {
+          display: none !important;
+        }
+        #printable-area-container, #printable-area {
+          margin: 0 !important;
+          padding: 1cm !important;
+          box-shadow: none !important;
+          border: none !important;
+          width: 100% !important;
+          height: 100% !important;
+          min-height: auto !important;
+          page-break-inside: avoid;
+        }
+        html, body {
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+        }
+        @page {
+          size: A4;
+          margin: 0;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
