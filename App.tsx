@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { ControlPanel } from './components/ControlPanel';
 import { PreviewPanel } from './components/PreviewPanel';
-import type { Worksheet, Exercise, Theme } from './types';
+import { ExportOptionsModal } from './components/ExportOptionsModal';
+import type { Worksheet, Exercise, Theme, BorderTheme, SchoolInfo } from './types';
 import { ExerciseType, coloringPages, mazes } from './types';
 
 // Declare global libraries loaded via CDN for TypeScript
@@ -15,6 +16,12 @@ declare global {
 const initialWorksheet: Worksheet = {
   title: 'Latihan Seru Hari Ini!',
   theme: 'default',
+  borderTheme: 'simple',
+  schoolInfo: {
+    schoolName: '',
+    teacherName: '',
+    logoUrl: '',
+  },
   exercises: [
     {
       id: '1',
@@ -69,6 +76,8 @@ const initialWorksheet: Worksheet = {
 const App: React.FC = () => {
   const [worksheet, setWorksheet] = useState<Worksheet>(initialWorksheet);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const updateTitle = useCallback((newTitle: string) => {
     setWorksheet(prev => ({ ...prev, title: newTitle }));
@@ -76,6 +85,14 @@ const App: React.FC = () => {
 
   const updateTheme = useCallback((newTheme: Theme) => {
     setWorksheet(prev => ({ ...prev, theme: newTheme }));
+  }, []);
+
+  const updateBorderTheme = useCallback((newBorderTheme: BorderTheme) => {
+    setWorksheet(prev => ({ ...prev, borderTheme: newBorderTheme }));
+  }, []);
+
+  const updateSchoolInfo = useCallback((newSchoolInfo: Partial<SchoolInfo>) => {
+    setWorksheet(prev => ({ ...prev, schoolInfo: { ...prev.schoolInfo, ...newSchoolInfo } }));
   }, []);
 
   const addExercise = useCallback((type: ExerciseType) => {
@@ -142,7 +159,15 @@ const App: React.FC = () => {
     window.print();
   };
 
-  const handleDownloadPdf = async () => {
+  const handleDownloadPdf = () => {
+    setIsExportModalOpen(true);
+  };
+
+  const handleExportPdf = async (
+    mode: 'all' | 'current' | 'range',
+    startPage?: number,
+    endPage?: number
+  ) => {
     setIsDownloading(true);
     const printableArea = document.getElementById('printable-area');
     if (!printableArea) {
@@ -152,25 +177,36 @@ const App: React.FC = () => {
     }
 
     try {
+      // High-quality capture at 300 DPI (scale: 3)
       const canvas = await window.html2canvas(printableArea, {
-        scale: 2, // Use higher scale for better resolution
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
       });
       const imgData = canvas.toDataURL('image/png');
-      
-      // A4 page dimensions in mm: 210 x 297
+
+      // A4 page dimensions in inches: 8.27 x 11.69
+      // Using 'in' unit for true A4 format
       const pdf = new window.jspdf.jsPDF({
         orientation: 'portrait',
-        unit: 'mm',
+        unit: 'in',
         format: 'a4',
+        compress: true,
       });
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${worksheet.title.replace(/\s+/g, '_').toLowerCase() || 'worksheet'}.pdf`);
+      // Add image to PDF maintaining A4 aspect ratio
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+
+      // Generate filename
+      const fileName = `${worksheet.title.replace(/\s+/g, '_').toLowerCase() || 'worksheet'}.pdf`;
+      pdf.save(fileName);
     } catch (error) {
       console.error("Error generating PDF:", error);
+      alert('Terjadi kesalahan saat membuat PDF. Silakan coba lagi.');
     } finally {
       setIsDownloading(false);
     }
@@ -203,6 +239,8 @@ const App: React.FC = () => {
             worksheet={worksheet}
             onUpdateTitle={updateTitle}
             onUpdateTheme={updateTheme}
+            onUpdateBorderTheme={updateBorderTheme}
+            onUpdateSchoolInfo={updateSchoolInfo}
             onAddExercise={addExercise}
             onUpdateExercise={updateExercise}
             onRemoveExercise={removeExercise}
@@ -215,6 +253,14 @@ const App: React.FC = () => {
           <PreviewPanel worksheet={worksheet} />
         </div>
       </main>
+
+      <ExportOptionsModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onExport={handleExportPdf}
+        totalPages={1}
+        currentPage={currentPage}
+      />
     </div>
   );
 };
