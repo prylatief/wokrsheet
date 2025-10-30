@@ -177,11 +177,24 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <header className="bg-white shadow-sm p-4 no-print">
-        <div className="container mx-auto">
-          <h1 className="text-3xl font-bold text-sky-600 font-comic">Kids Worksheet Generator</h1>
-          <p className="text-slate-600">Buat lembar kerja yang menyenangkan untuk anak-anak dengan mudah!</p>
+    <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 min-h-screen">
+      <header className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 shadow-lg p-6 no-print relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-4 left-10 text-6xl animate-bounce">⭐</div>
+          <div className="absolute top-8 right-20 text-5xl animate-pulse">🎨</div>
+          <div className="absolute bottom-4 left-1/4 text-4xl animate-bounce delay-100">✨</div>
+          <div className="absolute top-1/2 right-10 text-5xl animate-pulse delay-200">🌈</div>
+        </div>
+        <div className="container mx-auto relative z-10">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-6xl">📝</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-white font-comic drop-shadow-lg">
+              Kids Worksheet Generator
+            </h1>
+          </div>
+          <p className="text-white text-lg md:text-xl font-medium ml-20 drop-shadow">
+            Buat lembar kerja yang menyenangkan untuk anak-anak dengan mudah! 🚀
+          </p>
         </div>
       </header>
       <main className="container mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
