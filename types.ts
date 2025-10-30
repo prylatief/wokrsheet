@@ -85,10 +85,30 @@ export type Exercise =
 
 export type Theme = 'default' | 'space' | 'ocean' | 'garden';
 
+export type BorderTheme =
+  | 'none'
+  | 'simple'
+  | 'stars'
+  | 'rainbow'
+  | 'flowers'
+  | 'hearts'
+  | 'animals'
+  | 'geometric'
+  | 'clouds'
+  | 'music';
+
+export interface SchoolInfo {
+  schoolName: string;
+  teacherName: string;
+  logoUrl: string;
+}
+
 export interface Worksheet {
   title: string;
   exercises: Exercise[];
   theme: Theme;
+  borderTheme: BorderTheme;
+  schoolInfo: SchoolInfo;
 }
 
 // --- ASSETS ---

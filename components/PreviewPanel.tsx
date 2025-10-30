@@ -145,9 +145,45 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet }) => {
     garden: 'theme-garden',
   }[worksheet.theme];
 
+  const borderClass = {
+    none: '',
+    simple: 'border-simple',
+    stars: 'border-stars',
+    rainbow: 'border-rainbow',
+    flowers: 'border-flowers',
+    hearts: 'border-hearts',
+    animals: 'border-animals',
+    geometric: 'border-geometric',
+    clouds: 'border-clouds',
+    music: 'border-music',
+  }[worksheet.borderTheme];
+
   return (
     <div id="printable-area-container" className="bg-gradient-to-br from-blue-100 to-purple-100 p-4 md:p-8 rounded-2xl shadow-inner">
-      <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-10 font-comic text-slate-800 transition-colors duration-300 rounded-lg border-4 border-purple-200 ${themeClass}`}>
+      <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-10 font-comic text-slate-800 transition-colors duration-300 rounded-lg ${borderClass} ${themeClass}`}>
+        {/* School Header */}
+        {(worksheet.schoolInfo.schoolName || worksheet.schoolInfo.teacherName || worksheet.schoolInfo.logoUrl) && (
+          <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-purple-200">
+            <div className="flex items-center gap-3">
+              {worksheet.schoolInfo.logoUrl && (
+                <img
+                  src={worksheet.schoolInfo.logoUrl}
+                  alt="Logo Sekolah"
+                  className="h-12 w-12 object-contain"
+                />
+              )}
+              <div className="text-sm">
+                {worksheet.schoolInfo.schoolName && (
+                  <div className="font-bold text-purple-700">{worksheet.schoolInfo.schoolName}</div>
+                )}
+                {worksheet.schoolInfo.teacherName && (
+                  <div className="text-purple-600">Guru: {worksheet.schoolInfo.teacherName}</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <header className="flex justify-between items-center border-b-4 border-gradient-to-r from-purple-300 to-pink-300 pb-4 mb-8">
           <div className="text-lg font-bold">Nama: <span className="inline-block border-b-2 border-dotted border-purple-400 w-48"></span></div>
           <div className="text-lg font-bold">Kelas: <span className="inline-block border-b-2 border-dotted border-purple-400 w-24"></span></div>
