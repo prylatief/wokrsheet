@@ -20,12 +20,12 @@ const EmojiPicker: React.FC<{ value: string; onChange: (emoji: string) => void }
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="block w-full text-left px-3 py-1.5 border border-slate-300 rounded-md shadow-sm text-2xl"
+        className="block w-full text-left px-3 py-2 border-2 border-orange-300 rounded-lg shadow-sm text-2xl bg-white hover:border-orange-500 transition-all duration-200"
       >
         {value}
       </button>
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white border border-slate-300 rounded-md shadow-lg p-2 grid grid-cols-4 gap-2">
+        <div className="absolute z-10 mt-1 w-full bg-white border-2 border-orange-300 rounded-xl shadow-2xl p-3 grid grid-cols-4 gap-2">
           {KID_FRIENDLY_EMOJIS.map(emoji => (
             <button
               key={emoji}
@@ -34,7 +34,7 @@ const EmojiPicker: React.FC<{ value: string; onChange: (emoji: string) => void }
                 onChange(emoji);
                 setIsOpen(false);
               }}
-              className="p-1 text-2xl rounded-md hover:bg-slate-100"
+              className="p-2 text-2xl rounded-lg hover:bg-orange-100 transition-colors duration-150 transform hover:scale-110"
             >
               {emoji}
             </button>
@@ -48,7 +48,7 @@ const EmojiPicker: React.FC<{ value: string; onChange: (emoji: string) => void }
 
 const InputField: React.FC<{ label: string; id: string; children: React.ReactNode }> = ({ label, id, children }) => (
   <div>
-    <label htmlFor={id} className="block text-sm font-medium text-slate-600">
+    <label htmlFor={id} className="block text-sm font-bold text-orange-700 mb-1">
       {label}
     </label>
     <div className="mt-1">{children}</div>
@@ -62,7 +62,7 @@ const TextInput: React.FC<{ value: string; onChange: (e: React.ChangeEvent<HTMLI
     value={value}
     onChange={onChange}
     placeholder={placeholder}
-    className="block w-full px-3 py-1.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+    className="block w-full px-3 py-2 border-2 border-orange-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-500 text-sm transition-all duration-200"
   />
 );
 
@@ -73,12 +73,12 @@ const NumberInput: React.FC<{ value: number; onChange: (e: React.ChangeEvent<HTM
     value={value}
     onChange={onChange}
     min="0"
-    className="block w-full px-3 py-1.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+    className="block w-full px-3 py-2 border-2 border-orange-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-500 text-sm transition-all duration-200"
   />
 );
 
 const SelectInput: React.FC<{ value: string; onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; id: string; options: {key: string; name: string}[] }> = ({ value, onChange, id, options }) => (
-    <select id={id} value={value} onChange={onChange} className="block w-full px-3 py-1.5 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+    <select id={id} value={value} onChange={onChange} className="block w-full px-3 py-2 border-2 border-orange-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-500 text-sm transition-all duration-200 bg-white">
         {options.map(opt => <option key={opt.key} value={opt.key}>{opt.name}</option>)}
     </select>
 );
@@ -111,15 +111,15 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onU
             <InputField label="Angka Kedua" id={`num2-${exercise.id}`}>
               <NumberInput id={`num2-${exercise.id}`} value={exercise.config.num2} onChange={e => handleConfigChange('num2', parseInt(e.target.value, 10) || 0)} />
             </InputField>
-            <div className="flex items-center">
+            <div className="flex items-center bg-orange-100 p-3 rounded-lg">
               <input
                 id={`helpers-${exercise.id}`}
                 type="checkbox"
                 checked={exercise.config.showHelpers}
                 onChange={e => handleConfigChange('showHelpers', e.target.checked)}
-                className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+                className="h-5 w-5 text-orange-600 focus:ring-orange-500 border-2 border-orange-300 rounded"
               />
-              <label htmlFor={`helpers-${exercise.id}`} className="ml-2 block text-sm text-slate-900">
+              <label htmlFor={`helpers-${exercise.id}`} className="ml-3 block text-sm font-semibold text-orange-900">
                 Tampilkan Gambar Bantuan
               </label>
             </div>
@@ -182,7 +182,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onU
                 <button onClick={() => removePair(pair.id)} className="text-red-500 hover:text-red-700 shrink-0"><TrashIcon className="w-4 h-4" /></button>
               </div>
             ))}
-            <button onClick={addPair} className="flex items-center text-sm text-sky-600 hover:text-sky-800"><PlusIcon className="w-4 h-4 mr-1" /> Tambah Pasangan</button>
+            <button onClick={addPair} className="flex items-center text-sm font-bold text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 px-3 py-2 rounded-lg transition-all duration-200"><PlusIcon className="w-4 h-4 mr-1" /> Tambah Pasangan</button>
           </div>
         );
       case ExerciseType.SPELLING:
@@ -224,10 +224,10 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onU
   };
 
   return (
-    <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg">
+    <div className="bg-gradient-to-br from-orange-50 to-yellow-50 border-3 border-orange-200 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
       <div className="flex justify-between items-center mb-3">
-        <p className="font-semibold text-slate-700">{index + 1}. {exercise.type}</p>
-        <button onClick={() => onRemove(exercise.id)} className="text-red-500 hover:text-red-700">
+        <p className="font-bold text-orange-700 text-base">{index + 1}. {exercise.type}</p>
+        <button onClick={() => onRemove(exercise.id)} className="text-red-500 hover:text-red-700 hover:scale-110 transition-transform p-1 rounded-lg hover:bg-red-100">
           <TrashIcon className="w-5 h-5" />
         </button>
       </div>

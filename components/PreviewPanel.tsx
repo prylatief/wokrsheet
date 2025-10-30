@@ -126,7 +126,7 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 border border-slate-200">
+    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 border-3 border-orange-200 shadow-lg hover:shadow-xl transition-all duration-200">
       {renderContent()}
     </div>
   );
@@ -146,14 +146,16 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet }) => {
   }[worksheet.theme];
 
   return (
-    <div id="printable-area-container" className="bg-gray-200 p-4 md:p-8 rounded-lg">
-      <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-10 font-comic text-slate-800 transition-colors duration-300 ${themeClass}`}>
-        <header className="flex justify-between items-center border-b-2 border-slate-300 pb-4 mb-8">
-          <div className="text-lg">Nama: <span className="inline-block border-b-2 border-dotted w-48"></span></div>
-          <div className="text-lg">Kelas: <span className="inline-block border-b-2 border-dotted w-24"></span></div>
+    <div id="printable-area-container" className="bg-gradient-to-br from-blue-100 to-purple-100 p-4 md:p-8 rounded-2xl shadow-inner">
+      <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-10 font-comic text-slate-800 transition-colors duration-300 rounded-lg border-4 border-purple-200 ${themeClass}`}>
+        <header className="flex justify-between items-center border-b-4 border-gradient-to-r from-purple-300 to-pink-300 pb-4 mb-8">
+          <div className="text-lg font-bold">Nama: <span className="inline-block border-b-2 border-dotted border-purple-400 w-48"></span></div>
+          <div className="text-lg font-bold">Kelas: <span className="inline-block border-b-2 border-dotted border-purple-400 w-24"></span></div>
         </header>
 
-        <h1 className="text-4xl font-bold text-center text-sky-700 mb-10">{worksheet.title}</h1>
+        <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 p-2 rounded-2xl mb-10 shadow-lg">
+          <h1 className="text-4xl font-bold text-center text-white drop-shadow-lg">{worksheet.title}</h1>
+        </div>
 
         <div className="space-y-8">
           {worksheet.exercises.map((exercise, index) => (
