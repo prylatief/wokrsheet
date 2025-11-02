@@ -13,6 +13,8 @@ interface ControlPanelProps {
   onAddExercise: (type: ExerciseType) => void;
   onUpdateExercise: (id: string, newConfig: Partial<Exercise['config']>) => void;
   onRemoveExercise: (id: string) => void;
+  onMoveExerciseToPage: (id: string, pageNumber: number) => void;
+  totalPages: number;
   onPrint: () => void;
   onDownloadPdf: () => void;
   isDownloading: boolean;
@@ -47,6 +49,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onAddExercise,
   onUpdateExercise,
   onRemoveExercise,
+  onMoveExerciseToPage,
+  totalPages,
   onPrint,
   onDownloadPdf,
   isDownloading
@@ -198,6 +202,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
               index={index}
               onUpdate={onUpdateExercise}
               onRemove={onRemoveExercise}
+              onMoveToPage={onMoveExerciseToPage}
+              totalPages={totalPages}
             />
           ))}
         </div>

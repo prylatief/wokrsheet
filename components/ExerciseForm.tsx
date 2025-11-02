@@ -9,6 +9,8 @@ interface ExerciseFormProps {
   index: number;
   onUpdate: (id: string, newConfig: Partial<Exercise['config']>) => void;
   onRemove: (id: string) => void;
+  onMoveToPage: (id: string, pageNumber: number) => void;
+  totalPages: number;
 }
 
 const KID_FRIENDLY_EMOJIS = ['🍎', '⭐', '🚀', '😊', '🎈', '🚗', '🐶', '🐱', '🐞', '🦋', '🌈', '☀️', '⚽', '🍕', '🍦', '🍓'];
@@ -83,7 +85,7 @@ const SelectInput: React.FC<{ value: string; onChange: (e: React.ChangeEvent<HTM
     </select>
 );
 
-export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onUpdate, onRemove }) => {
+export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onUpdate, onRemove, onMoveToPage, totalPages }) => {
   const handleConfigChange = (key: string, value: any) => {
     onUpdate(exercise.id, { [key]: value });
   };
@@ -234,6 +236,20 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onU
       <div className="space-y-3">
         <InputField label="Judul Latihan" id={`title-${exercise.id}`}>
           <TextInput id={`title-${exercise.id}`} value={exercise.config.title} onChange={e => handleConfigChange('title', e.target.value)} placeholder="Judul Latihan" />
+        </InputField>
+        <InputField label="Halaman" id={`page-${exercise.id}`}>
+          <select
+            id={`page-${exercise.id}`}
+            value={exercise.pageNumber}
+            onChange={e => onMoveToPage(exercise.id, parseInt(e.target.value, 10))}
+            className="block w-full px-3 py-2 border-2 border-orange-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-500 text-sm transition-all duration-200 bg-white"
+          >
+            {Array.from({ length: totalPages + 1 }, (_, i) => i + 1).map(pageNum => (
+              <option key={pageNum} value={pageNum}>
+                Halaman {pageNum}
+              </option>
+            ))}
+          </select>
         </InputField>
         {renderFields()}
       </div>
