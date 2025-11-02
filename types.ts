@@ -72,16 +72,16 @@ interface MazeConfig extends BaseExerciseConfig {
 }
 
 export type Exercise =
-  | { id: string; type: ExerciseType.COUNTING; config: CountingConfig }
-  | { id: string; type: ExerciseType.ADDITION; config: AdditionConfig }
-  | { id: string; type: ExerciseType.SUBTRACTION; config: SubtractionConfig }
-  | { id: string; type: ExerciseType.TRACING; config: TracingConfig }
-  | { id: string; type: ExerciseType.DRAWING; config: DrawingConfig }
-  | { id: string; type: ExerciseType.PATTERN; config: PatternConfig }
-  | { id: string; type: ExerciseType.MATCHING; config: MatchingConfig }
-  | { id: string; type: ExerciseType.SPELLING; config: SpellingConfig }
-  | { id: string; type: ExerciseType.COLORING; config: ColoringConfig }
-  | { id: string; type: ExerciseType.MAZE; config: MazeConfig };
+  | { id: string; type: ExerciseType.COUNTING; config: CountingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.ADDITION; config: AdditionConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.SUBTRACTION; config: SubtractionConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.TRACING; config: TracingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.DRAWING; config: DrawingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.PATTERN; config: PatternConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.MATCHING; config: MatchingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.SPELLING; config: SpellingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.COLORING; config: ColoringConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.MAZE; config: MazeConfig; pageNumber: number };
 
 export type Theme = 'default' | 'space' | 'ocean' | 'garden';
 

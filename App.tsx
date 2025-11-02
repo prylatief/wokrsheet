@@ -30,7 +30,8 @@ const initialWorksheet: Worksheet = {
         emoji: '🍎',
         count: 5,
         title: 'Hitung Apel'
-      }
+      },
+      pageNumber: 1
     },
     {
       id: '2',
@@ -41,7 +42,8 @@ const initialWorksheet: Worksheet = {
         showHelpers: true,
         helperEmoji: '⭐',
         title: 'Penjumlahan Bintang'
-      }
+      },
+      pageNumber: 1
     },
     {
       id: '3',
@@ -52,7 +54,8 @@ const initialWorksheet: Worksheet = {
         showHelpers: true,
         helperEmoji: '🚀',
         title: 'Pengurangan Roket'
-      }
+      },
+      pageNumber: 1
     },
     {
       id: '4',
@@ -60,7 +63,8 @@ const initialWorksheet: Worksheet = {
       config: {
         title: 'Lanjutkan Pola Berikut',
         items: ['😊', '😂', '😊']
-      }
+      },
+      pageNumber: 1
     },
     {
       id: '5',
@@ -68,7 +72,8 @@ const initialWorksheet: Worksheet = {
       config: {
         text: 'ABCDE',
         title: 'Tebalkan Huruf'
-      }
+      },
+      pageNumber: 1
     },
   ]
 };
@@ -100,44 +105,44 @@ const App: React.FC = () => {
     let newExercise: Exercise;
     switch (type) {
       case ExerciseType.COUNTING:
-        newExercise = { id: newId, type, config: { title: 'Hitung Gambar', emoji: '😊', count: 3 } };
+        newExercise = { id: newId, type, config: { title: 'Hitung Gambar', emoji: '😊', count: 3 }, pageNumber: currentPage };
         break;
       case ExerciseType.ADDITION:
-        newExercise = { id: newId, type, config: { title: 'Penjumlahan', num1: 1, num2: 2, showHelpers: true, helperEmoji: '🚀' } };
+        newExercise = { id: newId, type, config: { title: 'Penjumlahan', num1: 1, num2: 2, showHelpers: true, helperEmoji: '🚀' }, pageNumber: currentPage };
         break;
       case ExerciseType.SUBTRACTION:
-        newExercise = { id: newId, type, config: { title: 'Pengurangan', num1: 5, num2: 2, showHelpers: true, helperEmoji: '🎈' } };
+        newExercise = { id: newId, type, config: { title: 'Pengurangan', num1: 5, num2: 2, showHelpers: true, helperEmoji: '🎈' }, pageNumber: currentPage };
         break;
       case ExerciseType.TRACING:
-        newExercise = { id: newId, type, config: { title: 'Tebalkan Teks', text: 'Halo' } };
+        newExercise = { id: newId, type, config: { title: 'Tebalkan Teks', text: 'Halo' }, pageNumber: currentPage };
         break;
       case ExerciseType.DRAWING:
-        newExercise = { id: newId, type, config: { title: 'Ayo Menggambar', instruction: 'Gambarlah hewan kesukaanmu' } };
+        newExercise = { id: newId, type, config: { title: 'Ayo Menggambar', instruction: 'Gambarlah hewan kesukaanmu' }, pageNumber: currentPage };
         break;
       case ExerciseType.PATTERN:
-        newExercise = { id: newId, type, config: { title: 'Lanjutkan Pola', items: ['🍎', '🍌', '🍎'] } };
+        newExercise = { id: newId, type, config: { title: 'Lanjutkan Pola', items: ['🍎', '🍌', '🍎'] }, pageNumber: currentPage };
         break;
       case ExerciseType.MATCHING:
         newExercise = { id: newId, type, config: { title: 'Jodohkan Gambar', pairs: [
           {id: crypto.randomUUID(), item1: 'Sapi', item2: 'Rumput'},
           {id: crypto.randomUUID(), item1: 'Monyet', item2: 'Pisang'},
           {id: crypto.randomUUID(), item1: 'Kucing', item2: 'Ikan'},
-        ] } };
+        ] }, pageNumber: currentPage };
         break;
       case ExerciseType.SPELLING:
-        newExercise = { id: newId, type, config: { title: 'Mengeja Nama Benda', word: 'BOLA', emojiHint: '⚽' } };
+        newExercise = { id: newId, type, config: { title: 'Mengeja Nama Benda', word: 'BOLA', emojiHint: '⚽' }, pageNumber: currentPage };
         break;
       case ExerciseType.COLORING:
-        newExercise = { id: newId, type, config: { title: 'Ayo Mewarnai', instruction: 'Warnai gambar di bawah ini!', svgKey: coloringPages[0].key } };
+        newExercise = { id: newId, type, config: { title: 'Ayo Mewarnai', instruction: 'Warnai gambar di bawah ini!', svgKey: coloringPages[0].key }, pageNumber: currentPage };
         break;
       case ExerciseType.MAZE:
-        newExercise = { id: newId, type, config: { title: 'Cari Jalan Keluar', instruction: 'Bantu tikus menemukan keju!', svgKey: mazes[0].key } };
+        newExercise = { id: newId, type, config: { title: 'Cari Jalan Keluar', instruction: 'Bantu tikus menemukan keju!', svgKey: mazes[0].key }, pageNumber: currentPage };
         break;
       default:
         return;
     }
     setWorksheet(prev => ({ ...prev, exercises: [...prev.exercises, newExercise] }));
-  }, []);
+  }, [currentPage]);
 
   const updateExercise = useCallback((id: string, newConfig: Partial<Exercise['config']>) => {
     setWorksheet(prev => ({
@@ -154,6 +159,21 @@ const App: React.FC = () => {
       exercises: prev.exercises.filter(ex => ex.id !== id)
     }));
   }, []);
+
+  const moveExerciseToPage = useCallback((id: string, newPage: number) => {
+    setWorksheet(prev => ({
+      ...prev,
+      exercises: prev.exercises.map(ex =>
+        ex.id === id ? { ...ex, pageNumber: newPage } as Exercise : ex
+      )
+    }));
+  }, []);
+
+  // Calculate total pages
+  const totalPages = React.useMemo(() => {
+    if (worksheet.exercises.length === 0) return 1;
+    return Math.max(...worksheet.exercises.map(ex => ex.pageNumber));
+  }, [worksheet.exercises]);
 
   const handlePrint = () => {
     window.print();
@@ -177,17 +197,20 @@ const App: React.FC = () => {
     }
 
     try {
-      // High-quality capture at 300 DPI (scale: 3)
-      const canvas = await window.html2canvas(printableArea, {
-        scale: 3,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-      });
-      const imgData = canvas.toDataURL('image/png');
+      // Determine which pages to export
+      let pagesToExport: number[] = [];
+      if (mode === 'all') {
+        pagesToExport = Array.from({ length: totalPages }, (_, i) => i + 1);
+      } else if (mode === 'current') {
+        pagesToExport = [currentPage];
+      } else if (mode === 'range' && startPage && endPage) {
+        pagesToExport = Array.from(
+          { length: endPage - startPage + 1 },
+          (_, i) => startPage + i
+        );
+      }
 
-      // A4 page dimensions in inches: 8.27 x 11.69
-      // Using 'in' unit for true A4 format
+      // Initialize PDF
       const pdf = new window.jspdf.jsPDF({
         orientation: 'portrait',
         unit: 'in',
@@ -198,8 +221,39 @@ const App: React.FC = () => {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      // Add image to PDF maintaining A4 aspect ratio
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      // Store original page
+      const originalPage = currentPage;
+
+      // Generate PDF for each page
+      for (let i = 0; i < pagesToExport.length; i++) {
+        const pageNum = pagesToExport[i];
+
+        // Update current page to render the correct exercises
+        setCurrentPage(pageNum);
+
+        // Wait for React to re-render
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // High-quality capture at 300 DPI (scale: 3)
+        const canvas = await window.html2canvas(printableArea, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+        });
+        const imgData = canvas.toDataURL('image/png');
+
+        // Add new page if not the first page
+        if (i > 0) {
+          pdf.addPage();
+        }
+
+        // Add image to PDF maintaining A4 aspect ratio
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      }
+
+      // Restore original page
+      setCurrentPage(originalPage);
 
       // Generate filename
       const fileName = `${worksheet.title.replace(/\s+/g, '_').toLowerCase() || 'worksheet'}.pdf`;
@@ -244,13 +298,20 @@ const App: React.FC = () => {
             onAddExercise={addExercise}
             onUpdateExercise={updateExercise}
             onRemoveExercise={removeExercise}
+            onMoveExerciseToPage={moveExerciseToPage}
+            totalPages={totalPages}
             onPrint={handlePrint}
             onDownloadPdf={handleDownloadPdf}
             isDownloading={isDownloading}
           />
         </div>
         <div className="lg:col-span-2">
-          <PreviewPanel worksheet={worksheet} />
+          <PreviewPanel
+            worksheet={worksheet}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </main>
 
@@ -258,7 +319,7 @@ const App: React.FC = () => {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         onExport={handleExportPdf}
-        totalPages={1}
+        totalPages={totalPages}
         currentPage={currentPage}
       />
     </div>

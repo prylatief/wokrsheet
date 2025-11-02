@@ -135,9 +135,12 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
 
 interface PreviewPanelProps {
   worksheet: Worksheet;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet }) => {
+export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPage, totalPages, onPageChange }) => {
   const themeClass = {
     default: '',
     space: 'theme-space',
@@ -158,9 +161,50 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet }) => {
     music: 'border-music',
   }[worksheet.borderTheme];
 
+  // Filter exercises for current page
+  const currentPageExercises = React.useMemo(() => {
+    return worksheet.exercises.filter(ex => ex.pageNumber === currentPage);
+  }, [worksheet.exercises, currentPage]);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    onPageChange(currentPage + 1);
+  };
+
   return (
-    <div id="printable-area-container" className="bg-gradient-to-br from-blue-100 to-purple-100 p-4 md:p-8 rounded-2xl shadow-inner">
-      <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-10 font-comic text-slate-800 transition-colors duration-300 rounded-lg ${borderClass} ${themeClass}`}>
+    <div className="space-y-4">
+      {/* Page Navigation */}
+      <div className="bg-white rounded-xl shadow-md p-4 flex items-center justify-between no-print">
+        <button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+        >
+          <span>←</span> Halaman Sebelumnya
+        </button>
+
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-bold text-purple-600">
+            Halaman {currentPage} dari {totalPages}
+          </span>
+        </div>
+
+        <button
+          onClick={handleNextPage}
+          className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+        >
+          Halaman Berikutnya <span>→</span>
+        </button>
+      </div>
+
+      {/* Preview Area */}
+      <div id="printable-area-container" className="bg-gradient-to-br from-blue-100 to-purple-100 p-4 md:p-8 rounded-2xl shadow-inner">
+        <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-10 font-comic text-slate-800 transition-colors duration-300 rounded-lg ${borderClass} ${themeClass}`}>
         {/* School Header */}
         {(worksheet.schoolInfo.schoolName || worksheet.schoolInfo.teacherName || worksheet.schoolInfo.logoUrl) && (
           <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-purple-200">
@@ -194,10 +238,22 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet }) => {
         </div>
 
         <div className="space-y-8">
-          {worksheet.exercises.map((exercise, index) => (
-            <ExerciseRenderer key={exercise.id} exercise={exercise} index={index} />
-          ))}
+          {currentPageExercises.length > 0 ? (
+            currentPageExercises.map((exercise, index) => (
+              <ExerciseRenderer key={exercise.id} exercise={exercise} index={index} />
+            ))
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-2xl text-gray-400 font-semibold">
+                Halaman ini masih kosong
+              </p>
+              <p className="text-lg text-gray-400 mt-2">
+                Tambahkan latihan dari panel kontrol di sebelah kiri
+              </p>
+            </div>
+          )}
         </div>
+      </div>
       </div>
     </div>
   );
