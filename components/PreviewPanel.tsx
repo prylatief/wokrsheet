@@ -133,6 +133,47 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
 };
 
 
+// Height estimation utility - should match App.tsx
+const estimateExerciseHeight = (exercise: Exercise): number => {
+  const baseHeight = 8;
+  switch (exercise.type) {
+    case ExerciseType.COUNTING:
+      return baseHeight + 6 + Math.ceil(exercise.config.count / 5) * 3;
+    case ExerciseType.ADDITION:
+    case ExerciseType.SUBTRACTION:
+      const helpersHeight = exercise.config.showHelpers ? 4 : 0;
+      return baseHeight + 6 + helpersHeight;
+    case ExerciseType.TRACING:
+      return baseHeight + 8;
+    case ExerciseType.DRAWING:
+      return baseHeight + 18;
+    case ExerciseType.PATTERN:
+      return baseHeight + 8;
+    case ExerciseType.MATCHING:
+      const pairCount = exercise.config.pairs.length;
+      return baseHeight + 6 + (pairCount * 2);
+    case ExerciseType.SPELLING:
+      return baseHeight + 10;
+    case ExerciseType.COLORING:
+      return baseHeight + 22;
+    case ExerciseType.MAZE:
+      return baseHeight + 22;
+    default:
+      return baseHeight + 10;
+  }
+};
+
+const calculatePageHeight = (exercises: Exercise[]): number => {
+  const headerHeight = 10;
+  const exerciseSpacing = 2;
+  const exercisesHeight = exercises.reduce((total, ex) => {
+    return total + estimateExerciseHeight(ex) + exerciseSpacing;
+  }, 0);
+  return headerHeight + exercisesHeight;
+};
+
+const MAX_PAGE_HEIGHT = 85;
+
 interface PreviewPanelProps {
   worksheet: Worksheet;
   currentPage: number;
@@ -165,6 +206,15 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
   const currentPageExercises = React.useMemo(() => {
     return worksheet.exercises.filter(ex => ex.pageNumber === currentPage);
   }, [worksheet.exercises, currentPage]);
+
+  // Calculate page fullness
+  const pageHeight = React.useMemo(() => {
+    return calculatePageHeight(currentPageExercises);
+  }, [currentPageExercises]);
+
+  const pageFullness = (pageHeight / MAX_PAGE_HEIGHT) * 100;
+  const isNearlyFull = pageFullness > 80;
+  const isOverfull = pageFullness > 100;
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -202,9 +252,52 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
         </button>
       </div>
 
+      {/* Page Capacity Indicator */}
+      {currentPageExercises.length > 0 && (
+        <div className={`rounded-xl shadow-md p-4 no-print ${isOverfull ? 'bg-red-50 border-2 border-red-300' : isNearlyFull ? 'bg-yellow-50 border-2 border-yellow-300' : 'bg-green-50 border-2 border-green-300'}`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-bold flex items-center gap-2">
+              {isOverfull ? (
+                <>
+                  <span className="text-xl">⚠️</span>
+                  <span className="text-red-700">Halaman Terlalu Penuh!</span>
+                </>
+              ) : isNearlyFull ? (
+                <>
+                  <span className="text-xl">⚡</span>
+                  <span className="text-yellow-700">Halaman Hampir Penuh</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-xl">✅</span>
+                  <span className="text-green-700">Kapasitas Halaman Baik</span>
+                </>
+              )}
+            </span>
+            <span className="text-sm font-bold">{Math.round(pageFullness)}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div
+              className={`h-full transition-all duration-300 ${isOverfull ? 'bg-red-500' : isNearlyFull ? 'bg-yellow-500' : 'bg-green-500'}`}
+              style={{ width: `${Math.min(pageFullness, 100)}%` }}
+            ></div>
+          </div>
+          {isOverfull && (
+            <p className="text-xs text-red-600 mt-2 font-medium">
+              💡 Konten melebihi ukuran A4. Pindahkan beberapa latihan ke halaman berikutnya untuk hasil cetak terbaik.
+            </p>
+          )}
+          {isNearlyFull && !isOverfull && (
+            <p className="text-xs text-yellow-600 mt-2 font-medium">
+              💡 Halaman hampir penuh. Latihan berikutnya akan otomatis pindah ke halaman baru.
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Preview Area */}
       <div id="printable-area-container" className="bg-gradient-to-br from-blue-100 to-purple-100 p-4 md:p-8 rounded-2xl shadow-inner">
-        <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-10 font-comic text-slate-800 transition-colors duration-300 rounded-lg ${borderClass} ${themeClass}`}>
+        <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-10 font-comic text-slate-800 transition-colors duration-300 rounded-lg overflow-hidden ${borderClass} ${themeClass}`}>
         {/* School Header */}
         {(worksheet.schoolInfo.schoolName || worksheet.schoolInfo.teacherName || worksheet.schoolInfo.logoUrl) && (
           <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-purple-200">
