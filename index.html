@@ -20,6 +20,16 @@
         letter-spacing: 0.5em;
       }
 
+      /* Improved border for print */
+      .border-b-3 {
+        border-bottom-width: 3px;
+      }
+
+      /* Ensure emojis render properly */
+      .font-comic span {
+        line-height: 1.2;
+      }
+
       /* Custom animations for playful effects */
       @keyframes float {
         0%, 100% {
@@ -205,27 +215,61 @@
         body {
           margin: 0;
           padding: 0;
+          background: white;
         }
         .no-print {
           display: none !important;
         }
-        #printable-area-container, #printable-area {
+        #printable-area-container {
+          padding: 0 !important;
           margin: 0 !important;
-          padding: 1cm !important;
+          background: white !important;
+        }
+        #printable-area {
+          margin: 0 !important;
+          padding: 1.5cm 1.5cm 2cm 1.5cm !important;
           box-shadow: none !important;
-          border: none !important;
-          width: 100% !important;
-          height: 100% !important;
-          min-height: auto !important;
+          width: 21cm !important;
+          min-height: 29.7cm !important;
+          max-width: 21cm !important;
           page-break-inside: avoid;
+          border-radius: 0 !important;
+          background: white !important;
+        }
+        /* Ensure border decorations print properly */
+        .border-simple,
+        .border-stars,
+        .border-rainbow,
+        .border-flowers,
+        .border-hearts,
+        .border-animals,
+        .border-geometric,
+        .border-clouds,
+        .border-music {
+          border-width: 4px !important;
+        }
+        /* Ensure decorative elements print */
+        .border-flowers::before,
+        .border-hearts::before,
+        .border-animals::before,
+        .border-clouds::before,
+        .border-music::before {
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
         }
         html, body {
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
         }
         @page {
-          size: A4;
+          size: A4 portrait;
           margin: 0;
+        }
+        /* Optimize exercise cards for print */
+        .exercise-card {
+          page-break-inside: avoid;
+          break-inside: avoid;
         }
       }
     </style>
