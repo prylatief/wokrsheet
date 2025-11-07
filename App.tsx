@@ -210,14 +210,15 @@ const App: React.FC = () => {
         );
       }
 
-      // Initialize PDF
+      // Initialize PDF with A4 dimensions
       const pdf = new window.jspdf.jsPDF({
         orientation: 'portrait',
-        unit: 'in',
+        unit: 'mm',
         format: 'a4',
         compress: true,
       });
 
+      // A4 dimensions in mm: 210 x 297
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
@@ -234,22 +235,32 @@ const App: React.FC = () => {
         // Wait for React to re-render
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // High-quality capture at 300 DPI (scale: 3)
+        // High-quality capture at 300 DPI for print quality
         const canvas = await window.html2canvas(printableArea, {
-          scale: 3,
+          scale: 2.5,
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
+          width: printableArea.scrollWidth,
+          height: printableArea.scrollHeight,
         });
-        const imgData = canvas.toDataURL('image/png');
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
         // Add new page if not the first page
         if (i > 0) {
-          pdf.addPage();
+          pdf.addPage('a4', 'portrait');
         }
 
-        // Add image to PDF maintaining A4 aspect ratio
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+        // Calculate dimensions to maintain aspect ratio and fit A4
+        const imgWidth = pdfWidth;
+        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        // Center the image vertically if it's shorter than the page
+        const yOffset = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
+
+        // Add image to PDF with proper A4 dimensions
+        pdf.addImage(imgData, 'JPEG', 0, yOffset, imgWidth, Math.min(imgHeight, pdfHeight), undefined, 'FAST');
       }
 
       // Restore original page
