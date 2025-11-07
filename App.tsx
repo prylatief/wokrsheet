@@ -80,48 +80,49 @@ const initialWorksheet: Worksheet = {
 
 // Utility function to estimate exercise height in relative units
 // These are approximate values based on typical rendering
+// Updated to match the enhanced layout with more padding and visual elements
 const estimateExerciseHeight = (exercise: Exercise): number => {
-  const baseHeight = 8; // Base padding and margins for each exercise card
+  const baseHeight = 12; // Increased for new card design with enhanced padding and borders
 
   switch (exercise.type) {
     case ExerciseType.COUNTING:
       // Title + emojis + answer line
-      return baseHeight + 6 + Math.ceil(exercise.config.count / 5) * 3;
+      return baseHeight + 8 + Math.ceil(exercise.config.count / 5) * 3;
 
     case ExerciseType.ADDITION:
     case ExerciseType.SUBTRACTION:
       // Title + equation + optional helpers
-      const helpersHeight = exercise.config.showHelpers ? 4 : 0;
-      return baseHeight + 6 + helpersHeight;
+      const helpersHeight = exercise.config.showHelpers ? 8 : 0;
+      return baseHeight + 8 + helpersHeight;
 
     case ExerciseType.TRACING:
       // Title + large text
-      return baseHeight + 8;
+      return baseHeight + 10;
 
     case ExerciseType.DRAWING:
       // Title + instruction + drawing area
-      return baseHeight + 18;
+      return baseHeight + 20;
 
     case ExerciseType.PATTERN:
       // Title + pattern items
-      return baseHeight + 8;
+      return baseHeight + 10;
 
     case ExerciseType.MATCHING:
       // Title + matching pairs (depends on number of pairs)
       const pairCount = exercise.config.pairs.length;
-      return baseHeight + 6 + (pairCount * 2);
+      return baseHeight + 8 + (pairCount * 3);
 
     case ExerciseType.SPELLING:
       // Title + emoji + letter boxes
-      return baseHeight + 10;
+      return baseHeight + 12;
 
     case ExerciseType.COLORING:
       // Title + instruction + SVG
-      return baseHeight + 22;
+      return baseHeight + 24;
 
     case ExerciseType.MAZE:
       // Title + instruction + SVG
-      return baseHeight + 22;
+      return baseHeight + 24;
 
     default:
       return baseHeight + 10;
@@ -130,7 +131,7 @@ const estimateExerciseHeight = (exercise: Exercise): number => {
 
 // Calculate total height of exercises on a page
 const calculatePageHeight = (exercises: Exercise[]): number => {
-  const headerHeight = 10; // Name, class, and worksheet title
+  const headerHeight = 15; // Name, class, worksheet title, and instructions (on page 1)
   const exerciseSpacing = 2; // Space between exercises
 
   const exercisesHeight = exercises.reduce((total, ex) => {
