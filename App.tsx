@@ -78,6 +78,71 @@ const initialWorksheet: Worksheet = {
   ]
 };
 
+// Utility function to estimate exercise height in relative units
+// These are approximate values based on typical rendering
+const estimateExerciseHeight = (exercise: Exercise): number => {
+  const baseHeight = 8; // Base padding and margins for each exercise card
+
+  switch (exercise.type) {
+    case ExerciseType.COUNTING:
+      // Title + emojis + answer line
+      return baseHeight + 6 + Math.ceil(exercise.config.count / 5) * 3;
+
+    case ExerciseType.ADDITION:
+    case ExerciseType.SUBTRACTION:
+      // Title + equation + optional helpers
+      const helpersHeight = exercise.config.showHelpers ? 4 : 0;
+      return baseHeight + 6 + helpersHeight;
+
+    case ExerciseType.TRACING:
+      // Title + large text
+      return baseHeight + 8;
+
+    case ExerciseType.DRAWING:
+      // Title + instruction + drawing area
+      return baseHeight + 18;
+
+    case ExerciseType.PATTERN:
+      // Title + pattern items
+      return baseHeight + 8;
+
+    case ExerciseType.MATCHING:
+      // Title + matching pairs (depends on number of pairs)
+      const pairCount = exercise.config.pairs.length;
+      return baseHeight + 6 + (pairCount * 2);
+
+    case ExerciseType.SPELLING:
+      // Title + emoji + letter boxes
+      return baseHeight + 10;
+
+    case ExerciseType.COLORING:
+      // Title + instruction + SVG
+      return baseHeight + 22;
+
+    case ExerciseType.MAZE:
+      // Title + instruction + SVG
+      return baseHeight + 22;
+
+    default:
+      return baseHeight + 10;
+  }
+};
+
+// Calculate total height of exercises on a page
+const calculatePageHeight = (exercises: Exercise[]): number => {
+  const headerHeight = 10; // Name, class, and worksheet title
+  const exerciseSpacing = 2; // Space between exercises
+
+  const exercisesHeight = exercises.reduce((total, ex) => {
+    return total + estimateExerciseHeight(ex) + exerciseSpacing;
+  }, 0);
+
+  return headerHeight + exercisesHeight;
+};
+
+// Maximum height that fits comfortably on an A4 page
+const MAX_PAGE_HEIGHT = 85; // Conservative estimate to ensure content fits
+
 const App: React.FC = () => {
   const [worksheet, setWorksheet] = useState<Worksheet>(initialWorksheet);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -141,7 +206,23 @@ const App: React.FC = () => {
       default:
         return;
     }
-    setWorksheet(prev => ({ ...prev, exercises: [...prev.exercises, newExercise] }));
+
+    // Check if adding this exercise would exceed page height
+    setWorksheet(prev => {
+      const currentPageExercises = prev.exercises.filter(ex => ex.pageNumber === currentPage);
+      const testExercises = [...currentPageExercises, newExercise];
+      const projectedHeight = calculatePageHeight(testExercises);
+
+      // If adding this exercise exceeds the max height, place it on the next page
+      if (projectedHeight > MAX_PAGE_HEIGHT && currentPageExercises.length > 0) {
+        const nextPage = currentPage + 1;
+        newExercise = { ...newExercise, pageNumber: nextPage };
+        // Automatically switch to the new page
+        setCurrentPage(nextPage);
+      }
+
+      return { ...prev, exercises: [...prev.exercises, newExercise] };
+    });
   }, [currentPage]);
 
   const updateExercise = useCallback((id: string, newConfig: Partial<Exercise['config']>) => {
