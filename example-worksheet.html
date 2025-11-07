@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contoh Worksheet Matematika - Layout Baru</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom right, #eff6ff, #f3e8ff);
+            padding: 20px;
+        }
+
+        .worksheet-container {
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 4px solid #e9d5ff;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header span {
+            border-bottom: 2px dotted #a855f7;
+            display: inline-block;
+            min-width: 200px;
+        }
+
+        .title {
+            background: linear-gradient(to right, #a855f7, #ec4899, #f97316);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+        }
+
+        .instructions {
+            background: linear-gradient(to right, #dbeafe, #f3e8ff);
+            border: 3px solid #a855f7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .instructions h2 {
+            color: #6b21a8;
+            font-size: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions ul {
+            list-style-position: inside;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .exercise {
+            background: linear-gradient(to bottom right, #fff7ed, #fef3c7, #fce7f3);
+            border: 3px solid #a855f7;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .exercise-number {
+            background: linear-gradient(to right, #a78bfa, #f472b6);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(167, 139, 250, 0.4);
+        }
+
+        .exercise-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7c3aed;
+        }
+
+        .question-box {
+            background: #eff6ff;
+            border: 2px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .question-instruction {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .emojis {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 60px;
+            margin: 25px 0;
+        }
+
+        .math-equation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            font-size: 48px;
+            font-weight: bold;
+            font-family: 'Comic Neue', cursive;
+            margin: 25px 0;
+        }
+
+        .math-equation .number {
+            color: #7c3aed;
+        }
+
+        .math-equation .operator {
+            color: #f97316;
+        }
+
+        .math-equation .question-mark {
+            color: #ec4899;
+        }
+
+        .visual-helpers {
+            margin-top: 25px;
+        }
+
+        .visual-helpers p {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .helper-groups {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 25px;
+        }
+
+        .helper-group {
+            background: white;
+            border: 2px solid #c084fc;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .helper-emojis {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 32px;
+            justify-content: center;
+            max-width: 200px;
+            margin-bottom: 8px;
+        }
+
+        .helper-count {
+            font-size: 13px;
+            font-weight: bold;
+            color: #7c3aed;
+        }
+
+        .answer-box {
+            background: #fef9c3;
+            border: 2px solid #fde047;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .answer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .answer-label {
+            color: #334155;
+        }
+
+        .answer-input {
+            background: white;
+            border: 3px solid #a855f7;
+            border-radius: 8px;
+            padding: 12px 30px;
+            min-width: 100px;
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            color: #cbd5e1;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .worksheet-container {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 1cm;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .emojis span {
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .emojis span:nth-child(1) { animation-delay: 0s; }
+        .emojis span:nth-child(2) { animation-delay: 0.1s; }
+        .emojis span:nth-child(3) { animation-delay: 0.2s; }
+        .emojis span:nth-child(4) { animation-delay: 0.3s; }
+        .emojis span:nth-child(5) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="worksheet-container">
+        <!-- Header -->
+        <div class="header">
+            <div>Nama: <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+            <div>Kelas: <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+        </div>
+
+        <!-- Title -->
+        <div class="title">Latihan Seru Hari Ini!</div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h2>📚 Petunjuk Pengerjaan:</h2>
+            <ul>
+                <li>Kerjakan semua soal dengan teliti</li>
+                <li>Tulis jawaban pada tempat yang tersedia</li>
+                <li>Gunakan pensil agar bisa dihapus jika salah</li>
+                <li>Jika ada gambar bantuan, gunakan untuk menghitung</li>
+                <li>Tanyakan pada guru jika ada yang tidak dimengerti</li>
+            </ul>
+        </div>
+
+        <!-- Exercise 1: Counting -->
+        <div class="exercise">
+            <div class="exercise-header">
+                <div class="exercise-number">Soal 1</div>
+                <div class="exercise-title">Hitung Apel</div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-instruction">📝 Hitung jumlah gambar di bawah ini:</div>
+                <div class="emojis">
+                    <span>🍎</span>
+                    <span>🍎</span>
+                    <span>🍎</span>
+                    <span>🍎</span>
+                    <span>🍎</span>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-content">
+                    <span class="answer-label">Jawaban:</span>
+                    <div class="answer-input">___</div>
+                    <span>🍎</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercise 2: Addition -->
+        <div class="exercise">
+            <div class="exercise-header">
+                <div class="exercise-number">Soal 2</div>
+                <div class="exercise-title">Penjumlahan Bintang</div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-instruction">📝 Hitung: 3 ditambah 4 = ?</div>
+                <div class="math-equation">
+                    <span class="number">3</span>
+                    <span class="operator">+</span>
+                    <span class="number">4</span>
+                    <span class="operator">=</span>
+                    <span class="question-mark">?</span>
+                </div>
+
+                <div class="visual-helpers">
+                    <p>Bantuan visual:</p>
+                    <div class="helper-groups">
+                        <div class="helper-group">
+                            <div class="helper-emojis">
+                                <span>⭐</span>
+                                <span>⭐</span>
+                                <span>⭐</span>
+                            </div>
+                            <div class="helper-count">3</div>
+                        </div>
+                        <div style="font-size: 32px; font-weight: bold; color: #f97316; align-self: center;">+</div>
+                        <div class="helper-group">
+                            <div class="helper-emojis">
+                                <span>⭐</span>
+                                <span>⭐</span>
+                                <span>⭐</span>
+                                <span>⭐</span>
+                            </div>
+                            <div class="helper-count">4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-content">
+                    <span class="answer-label">Jawaban:</span>
+                    <div class="answer-input">___</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercise 3: Subtraction -->
+        <div class="exercise">
+            <div class="exercise-header">
+                <div class="exercise-number">Soal 3</div>
+                <div class="exercise-title">Pengurangan Roket</div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-instruction">📝 Hitung: 8 dikurangi 3 = ?</div>
+                <div class="math-equation">
+                    <span class="number">8</span>
+                    <span class="operator">-</span>
+                    <span class="number">3</span>
+                    <span class="operator">=</span>
+                    <span class="question-mark">?</span>
+                </div>
+
+                <div class="visual-helpers">
+                    <p>Bantuan visual:</p>
+                    <div class="helper-groups">
+                        <div class="helper-group">
+                            <div class="helper-emojis">
+                                <span>🚀</span>
+                                <span>🚀</span>
+                                <span>🚀</span>
+                                <span>🚀</span>
+                                <span>🚀</span>
+                                <span>🚀</span>
+                                <span>🚀</span>
+                                <span>🚀</span>
+                            </div>
+                            <div class="helper-count">8</div>
+                        </div>
+                        <div style="font-size: 32px; font-weight: bold; color: #f97316; align-self: center;">-</div>
+                        <div class="helper-group">
+                            <div class="helper-emojis">
+                                <span>🚀</span>
+                                <span>🚀</span>
+                                <span>🚀</span>
+                            </div>
+                            <div class="helper-count">3</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-content">
+                    <span class="answer-label">Jawaban:</span>
+                    <div class="answer-input">___</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
