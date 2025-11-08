@@ -123,13 +123,14 @@
       .border-flowers::before {
         content: '🌸 🌺 🌻 🌷 🌼';
         position: absolute;
-        top: -12px;
+        top: 4px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 20px;
         background: white;
         padding: 0 10px;
         letter-spacing: 10px;
+        z-index: 10;
       }
 
       .border-hearts {
@@ -140,13 +141,14 @@
       .border-hearts::before {
         content: '💕 💖 💗 💓 💝';
         position: absolute;
-        top: -12px;
+        top: 4px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 20px;
         background: white;
         padding: 0 10px;
         letter-spacing: 10px;
+        z-index: 10;
       }
 
       .border-animals {
@@ -157,13 +159,14 @@
       .border-animals::before {
         content: '🐾 🦁 🐘 🦊 🐨';
         position: absolute;
-        top: -12px;
+        top: 4px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 20px;
         background: white;
         padding: 0 10px;
         letter-spacing: 10px;
+        z-index: 10;
       }
 
       .border-geometric {
@@ -185,13 +188,14 @@
       .border-clouds::before {
         content: '☁️ ⛅ 🌤️ 🌥️ ☁️';
         position: absolute;
-        top: -12px;
+        top: 4px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 20px;
         background: white;
         padding: 0 10px;
         letter-spacing: 10px;
+        z-index: 10;
       }
 
       .border-music {
@@ -202,13 +206,14 @@
       .border-music::before {
         content: '🎵 🎶 🎼 🎹 🎸';
         position: absolute;
-        top: -12px;
+        top: 4px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 20px;
         background: white;
         padding: 0 10px;
         letter-spacing: 10px;
+        z-index: 10;
       }
 
       @media print {
@@ -227,7 +232,7 @@
         }
         #printable-area {
           margin: 0 !important;
-          padding: 1cm 1cm 1cm 1cm !important;
+          padding: 1.2cm 1cm 1cm 1cm !important;
           box-shadow: none !important;
           width: 21cm !important;
           height: auto !important;
@@ -250,7 +255,7 @@
         .border-music {
           border-width: 4px !important;
         }
-        /* Ensure decorative elements print */
+        /* Ensure decorative elements print properly with adjusted positioning */
         .border-flowers::before,
         .border-hearts::before,
         .border-animals::before,
@@ -258,6 +263,9 @@
         .border-music::before {
           print-color-adjust: exact;
           -webkit-print-color-adjust: exact;
+          top: 2px !important;
+          font-size: 18px !important;
+          letter-spacing: 8px !important;
         }
         html, body {
           print-color-adjust: exact;
