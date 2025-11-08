@@ -216,6 +216,66 @@
         z-index: 10;
       }
 
+      /* Interactive Maze Styles */
+      .maze-container {
+        position: relative;
+        transition: transform 0.3s ease;
+      }
+
+      .maze-interactive path {
+        transition: stroke 0.3s ease, stroke-width 0.3s ease;
+      }
+
+      .maze-interactive:hover path {
+        stroke: #6366f1 !important;
+        stroke-width: 5 !important;
+      }
+
+      .maze-start-marker {
+        transition: r 0.3s ease, fill 0.3s ease;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      .maze-end-marker {
+        transition: r 0.3s ease, fill 0.3s ease;
+        animation: pulse 2s ease-in-out infinite;
+        animation-delay: 1s;
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          r: 3;
+          opacity: 1;
+        }
+        50% {
+          r: 5;
+          opacity: 0.7;
+        }
+      }
+
+      .maze-interactive:hover .maze-start-marker {
+        fill: #059669 !important;
+      }
+
+      .maze-interactive:hover .maze-end-marker {
+        fill: #dc2626 !important;
+      }
+
+      /* Print styles for maze */
+      @media print {
+        .maze-interactive path {
+          stroke: black !important;
+          stroke-width: 4 !important;
+        }
+
+        .maze-start-marker,
+        .maze-end-marker {
+          animation: none !important;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+      }
+
       @media print {
         body {
           margin: 0;
