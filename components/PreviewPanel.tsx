@@ -139,6 +139,129 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
               </div>
             </div>
           );
+      case ExerciseType.JUZ_AMMA:
+        const { exerciseType: juzType, verses, surah, blankWord } = exercise.config;
+
+        if (juzType === 'fill_blank') {
+          return (
+            <div>
+              <p className="text-lg font-bold text-center mb-2 text-purple-700 print:text-base">{exercise.config.title}</p>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-2 border-green-200 print:p-3">
+                <div className="text-center mb-3">
+                  <span className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full print:text-xs">
+                    Surat {surah}
+                  </span>
+                </div>
+                {verses.map((verse, idx) => {
+                  const words = verse.arabic.split(' ');
+                  const wordToBlank = blankWord || words[Math.floor(words.length / 2)];
+                  const modifiedArabic = verse.arabic.replace(wordToBlank, '________');
+
+                  return (
+                    <div key={idx} className="mb-4 last:mb-0">
+                      <div className="text-right font-arabic text-2xl leading-relaxed mb-2 print:text-xl" dir="rtl">
+                        {modifiedArabic}
+                      </div>
+                      <div className="text-xs text-gray-600 italic print:text-[10px]">
+                        ({verse.verseNumber}) {verse.translation}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        if (juzType === 'matching') {
+          // Matching ayat dengan terjemahan
+          const shuffledTranslations = [...verses.map(v => v.translation)].sort(() => Math.random() - 0.5);
+          return (
+            <div>
+              <p className="text-lg font-bold text-center mb-2 text-purple-700 print:text-base">{exercise.config.title}</p>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-2 border-green-200 print:p-3">
+                <div className="text-center mb-3">
+                  <span className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full print:text-xs">
+                    Surat {surah} - Jodohkan Ayat dan Terjemahan
+                  </span>
+                </div>
+                <div className="flex justify-around items-start gap-4 text-sm print:text-xs">
+                  <div className="space-y-3 flex-1 print:space-y-2">
+                    {verses.map((verse, idx) => (
+                      <div key={idx} className="flex items-center justify-end gap-2">
+                        <div className="text-right font-arabic text-lg leading-relaxed print:text-base" dir="rtl">
+                          {verse.arabic}
+                        </div>
+                        <span className="inline-block w-6 h-6 border-2 border-green-600 rounded-full shrink-0 print:w-5 print:h-5"></span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-3 flex-1 print:space-y-2">
+                    {shuffledTranslations.map((translation, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <span className="inline-block w-6 h-6 border-2 border-green-600 rounded-full shrink-0 print:w-5 print:h-5"></span>
+                        <div className="italic text-gray-700">{translation}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (juzType === 'tracing') {
+          return (
+            <div>
+              <p className="text-lg font-bold text-center mb-2 text-purple-700 print:text-base">{exercise.config.title}</p>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-2 border-green-200 print:p-3">
+                <div className="text-center mb-3">
+                  <span className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full print:text-xs">
+                    Surat {surah} - Tebalkan Ayat
+                  </span>
+                </div>
+                {verses.map((verse, idx) => (
+                  <div key={idx} className="mb-5 last:mb-0">
+                    <p className="text-right font-arabic text-3xl leading-relaxed trace-text tracking-wider print:text-2xl" dir="rtl">
+                      {verse.arabic}
+                    </p>
+                    <div className="text-xs text-gray-600 italic mt-2 print:text-[10px]">
+                      ({verse.verseNumber}) {verse.translation}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        if (juzType === 'complete_verse') {
+          return (
+            <div>
+              <p className="text-lg font-bold text-center mb-2 text-purple-700 print:text-base">{exercise.config.title}</p>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-2 border-green-200 print:p-3">
+                <div className="text-center mb-3">
+                  <span className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full print:text-xs">
+                    Surat {surah} - Tulis Ayat Lengkap
+                  </span>
+                </div>
+                {verses.map((verse, idx) => (
+                  <div key={idx} className="mb-5 last:mb-0">
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-sm font-bold text-green-700 print:text-xs">Ayat {verse.verseNumber}:</span>
+                      <span className="text-xs text-gray-600 italic flex-1 print:text-[10px]">{verse.translation}</span>
+                    </div>
+                    <div className="w-full min-h-[60px] border-2 border-dashed border-green-400 rounded-lg bg-white p-2 print:min-h-[50px]">
+                      {/* Ruang untuk menulis */}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        return null;
       default:
         return null;
     }
@@ -177,6 +300,20 @@ const estimateExerciseHeight = (exercise: Exercise): number => {
       return baseHeight + 22;
     case ExerciseType.MAZE:
       return baseHeight + 22;
+    case ExerciseType.JUZ_AMMA:
+      const verseCount = exercise.config.verses?.length || 1;
+      const { exerciseType: juzExType } = exercise.config;
+      if (juzExType === 'matching') {
+        return baseHeight + 8 + (verseCount * 5);
+      }
+      if (juzExType === 'tracing') {
+        return baseHeight + 10 + (verseCount * 6);
+      }
+      if (juzExType === 'complete_verse') {
+        return baseHeight + 8 + (verseCount * 8);
+      }
+      // fill_blank
+      return baseHeight + 8 + (verseCount * 4);
     default:
       return baseHeight + 10;
   }

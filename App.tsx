@@ -3,7 +3,7 @@ import { ControlPanel } from './components/ControlPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { ExportOptionsModal } from './components/ExportOptionsModal';
 import type { Worksheet, Exercise, Theme, BorderTheme, SchoolInfo } from './types';
-import { ExerciseType, coloringPages, mazes } from './types';
+import { ExerciseType, coloringPages, mazes, juzAmmaData } from './types';
 
 // Declare global libraries loaded via CDN for TypeScript
 declare global {
@@ -123,6 +123,22 @@ const estimateExerciseHeight = (exercise: Exercise): number => {
       // Title + instruction + SVG
       return baseHeight + 22;
 
+    case ExerciseType.JUZ_AMMA:
+      // Title + verses (depends on exercise type and verse count)
+      const verseCount = exercise.config.verses?.length || 1;
+      const { exerciseType: juzExType } = exercise.config;
+      if (juzExType === 'matching') {
+        return baseHeight + 8 + (verseCount * 5);
+      }
+      if (juzExType === 'tracing') {
+        return baseHeight + 10 + (verseCount * 6);
+      }
+      if (juzExType === 'complete_verse') {
+        return baseHeight + 8 + (verseCount * 8);
+      }
+      // fill_blank
+      return baseHeight + 8 + (verseCount * 4);
+
     default:
       return baseHeight + 10;
   }
@@ -202,6 +218,21 @@ const App: React.FC = () => {
         break;
       case ExerciseType.MAZE:
         newExercise = { id: newId, type, config: { title: 'Cari Jalan Keluar', instruction: 'Bantu tikus menemukan keju!', svgKey: mazes[0].key }, pageNumber: currentPage };
+        break;
+      case ExerciseType.JUZ_AMMA:
+        const firstSurah = juzAmmaData[0];
+        newExercise = {
+          id: newId,
+          type,
+          config: {
+            title: 'Latihan Juz Amma',
+            exerciseType: 'fill_blank',
+            surah: firstSurah.name,
+            verses: [firstSurah.verses[0]],
+            blankWord: undefined
+          },
+          pageNumber: currentPage
+        };
         break;
       default:
         return;
