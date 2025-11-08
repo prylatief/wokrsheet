@@ -132,7 +132,7 @@ export const mazes = [
   {
     key: 'simple_maze',
     name: 'Labirin Mudah',
-    content: `<svg style="width: 90%; margin: 0 auto; display: block;" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 H 90 V 90 H 10 V 10 M 10 30 H 70 M 30 10 V 50 M 30 70 H 90 M 50 30 H 90 V 70 M 70 50 H 10" stroke="black" stroke-width="4" fill="none" stroke-linecap="round" /><text x="15" y="22" font-size="10" font-family="Comic Neue, cursive">Mulai</text><text x="65" y="98" font-size="10" font-family="Comic Neue, cursive">Selesai</text></svg>`
+    content: `<svg style="width: 90%; margin: 0 auto; display: block;" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 H 90 V 90 H 10 V 10 M 10 30 H 70 M 30 10 V 50 M 30 70 H 90 M 50 30 H 90 V 70 M 70 50 H 10" stroke="black" stroke-width="4" fill="none" stroke-linecap="round" /><text x="15" y="22" font-size="7" font-family="Comic Neue, cursive">Mulai</text><text x="65" y="98" font-size="7" font-family="Comic Neue, cursive">Selesai</text></svg>`
   }
 ];
 
