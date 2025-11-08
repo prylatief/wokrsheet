@@ -297,7 +297,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
 
       {/* Preview Area */}
       <div id="printable-area-container" className="bg-gradient-to-br from-blue-100 to-purple-100 p-4 md:p-8 rounded-2xl shadow-inner">
-        <div id="printable-area" className={`w-full aspect-[210/297] bg-white mx-auto shadow-2xl p-8 font-comic text-slate-800 transition-colors duration-300 rounded-lg overflow-hidden ${borderClass} ${themeClass}`}>
+        <div id="printable-area" className={`w-full max-w-[210mm] min-h-[297mm] bg-white mx-auto shadow-2xl p-8 font-comic text-slate-800 transition-colors duration-300 rounded-lg ${borderClass} ${themeClass}`}>
         {/* School Header */}
         {(worksheet.schoolInfo.schoolName || worksheet.schoolInfo.teacherName || worksheet.schoolInfo.logoUrl) && (
           <div className="flex items-center justify-between mb-3 pb-2 border-b-2 border-purple-200 print:mb-2">
