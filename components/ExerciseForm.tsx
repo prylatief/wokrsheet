@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import type { Exercise, MatchingPair } from '../types';
-import { ExerciseType, coloringPages, mazes } from '../types';
+import type { Exercise, MatchingPair, JuzAmmaVerse } from '../types';
+import { ExerciseType, coloringPages, mazes, juzAmmaData } from '../types';
 import { TrashIcon, PlusIcon } from './Icons';
 
 interface ExerciseFormProps {
@@ -219,6 +219,101 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onU
                     <SelectInput id={`maze-svg-${exercise.id}`} value={exercise.config.svgKey} onChange={e => handleConfigChange('svgKey', e.target.value)} options={mazes} />
                 </InputField>
             </>
+        );
+      case ExerciseType.JUZ_AMMA:
+        const surahOptions = juzAmmaData.map(s => ({ key: s.name, name: `${s.name} (${s.arabicName})` }));
+        const exerciseTypeOptions = [
+          { key: 'fill_blank', name: 'Isi Kata yang Hilang' },
+          { key: 'matching', name: 'Menjodohkan Ayat dan Terjemahan' },
+          { key: 'tracing', name: 'Menebalkan Ayat Arab' },
+          { key: 'complete_verse', name: 'Menulis Ayat Lengkap' }
+        ];
+
+        const selectedSurah = juzAmmaData.find(s => s.name === exercise.config.surah);
+        const maxVerses = selectedSurah?.verses.length || 1;
+
+        return (
+          <>
+            <InputField label="Pilih Surat" id={`juz-surah-${exercise.id}`}>
+              <SelectInput
+                id={`juz-surah-${exercise.id}`}
+                value={exercise.config.surah}
+                onChange={e => {
+                  handleConfigChange('surah', e.target.value);
+                  // Reset verses ketika ganti surat
+                  const newSurah = juzAmmaData.find(s => s.name === e.target.value);
+                  if (newSurah) {
+                    handleConfigChange('verses', [newSurah.verses[0]]);
+                  }
+                }}
+                options={surahOptions}
+              />
+            </InputField>
+
+            <InputField label="Jenis Latihan" id={`juz-type-${exercise.id}`}>
+              <SelectInput
+                id={`juz-type-${exercise.id}`}
+                value={exercise.config.exerciseType}
+                onChange={e => handleConfigChange('exerciseType', e.target.value)}
+                options={exerciseTypeOptions}
+              />
+            </InputField>
+
+            {selectedSurah && (
+              <div className="space-y-2">
+                <p className="block text-sm font-medium text-slate-600">Pilih Ayat (max 3 ayat)</p>
+                <div className="space-y-2 max-h-40 overflow-y-auto bg-white p-2 rounded-lg border-2 border-orange-200">
+                  {selectedSurah.verses.map((verse) => {
+                    const isSelected = exercise.config.verses?.some(v => v.verseNumber === verse.number);
+                    return (
+                      <label key={verse.number} className="flex items-start gap-2 p-2 hover:bg-orange-50 rounded cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={(e) => {
+                            let newVerses: JuzAmmaVerse[] = [];
+                            if (e.target.checked) {
+                              // Tambahkan ayat, max 3
+                              const current = exercise.config.verses || [];
+                              if (current.length < 3) {
+                                newVerses = [...current, { surah: selectedSurah.name, verseNumber: verse.number, arabic: verse.arabic, translation: verse.translation }];
+                              } else {
+                                // Jika sudah 3, ganti yang terakhir
+                                newVerses = [...current.slice(0, 2), { surah: selectedSurah.name, verseNumber: verse.number, arabic: verse.arabic, translation: verse.translation }];
+                              }
+                            } else {
+                              // Hapus ayat
+                              newVerses = (exercise.config.verses || []).filter(v => v.verseNumber !== verse.number);
+                            }
+                            handleConfigChange('verses', newVerses);
+                          }}
+                          className="mt-1 h-4 w-4 text-orange-600 focus:ring-orange-500 border-2 border-orange-300 rounded"
+                        />
+                        <div className="flex-1 text-xs">
+                          <div className="font-bold text-orange-700">Ayat {verse.number}</div>
+                          <div className="text-right font-arabic text-lg leading-relaxed mt-1" dir="rtl">{verse.arabic}</div>
+                          <div className="text-gray-600 italic mt-1">{verse.translation}</div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-500">Ayat terpilih: {exercise.config.verses?.length || 0}/3</p>
+              </div>
+            )}
+
+            {exercise.config.exerciseType === 'fill_blank' && (
+              <InputField label="Kata yang akan dihilangkan (opsional)" id={`juz-blank-${exercise.id}`}>
+                <TextInput
+                  id={`juz-blank-${exercise.id}`}
+                  value={exercise.config.blankWord || ''}
+                  onChange={e => handleConfigChange('blankWord', e.target.value)}
+                  placeholder="Contoh: اللَّهُ"
+                />
+                <p className="text-xs text-gray-500 mt-1">Kosongkan untuk pilih kata random</p>
+              </InputField>
+            )}
+          </>
         );
       default:
         return null;
