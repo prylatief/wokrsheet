@@ -316,14 +316,20 @@ const App: React.FC = () => {
         // Wait for React to re-render
         await new Promise(resolve => setTimeout(resolve, 100));
 
+        // Get the actual content height
+        const actualHeight = printableArea.scrollHeight;
+        const actualWidth = printableArea.scrollWidth;
+
         // High-quality capture at 300 DPI for print quality
         const canvas = await window.html2canvas(printableArea, {
           scale: 2.5,
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
-          width: printableArea.scrollWidth,
-          height: printableArea.scrollHeight,
+          width: actualWidth,
+          height: actualHeight,
+          windowWidth: actualWidth,
+          windowHeight: actualHeight,
         });
 
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
@@ -333,15 +339,22 @@ const App: React.FC = () => {
           pdf.addPage('a4', 'portrait');
         }
 
-        // Calculate dimensions to maintain aspect ratio and fit A4
+        // Calculate dimensions to fit content on A4 page
         const imgWidth = pdfWidth;
         const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        // Center the image vertically if it's shorter than the page
-        const yOffset = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
-
-        // Add image to PDF with proper A4 dimensions
-        pdf.addImage(imgData, 'JPEG', 0, yOffset, imgWidth, Math.min(imgHeight, pdfHeight), undefined, 'FAST');
+        // If content is taller than A4, scale it down to fit
+        if (imgHeight > pdfHeight) {
+          const scale = pdfHeight / imgHeight;
+          const scaledWidth = imgWidth * scale;
+          const scaledHeight = pdfHeight;
+          const xOffset = (pdfWidth - scaledWidth) / 2;
+          pdf.addImage(imgData, 'JPEG', xOffset, 0, scaledWidth, scaledHeight, undefined, 'FAST');
+        } else {
+          // Center the image vertically if it's shorter than the page
+          const yOffset = (pdfHeight - imgHeight) / 2;
+          pdf.addImage(imgData, 'JPEG', 0, yOffset, imgWidth, imgHeight, undefined, 'FAST');
+        }
       }
 
       // Restore original page
