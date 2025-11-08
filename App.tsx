@@ -291,6 +291,23 @@ const App: React.FC = () => {
     setIsExportModalOpen(true);
   };
 
+  // Helper function to ensure all fonts are loaded
+  const waitForFonts = async (): Promise<void> => {
+    // Wait for document fonts to be ready
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+
+    // Additional wait to ensure fonts are fully rendered
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Force a reflow to ensure all text is rendered with correct fonts
+    const printableArea = document.getElementById('printable-area');
+    if (printableArea) {
+      printableArea.offsetHeight; // Force reflow
+    }
+  };
+
   const handleExportPdf = async (
     mode: 'all' | 'current' | 'range',
     startPage?: number,
@@ -305,6 +322,9 @@ const App: React.FC = () => {
     }
 
     try {
+      // Ensure all fonts (especially Arabic) are loaded
+      await waitForFonts();
+
       // Determine which pages to export
       let pagesToExport: number[] = [];
       if (mode === 'all') {
@@ -340,15 +360,20 @@ const App: React.FC = () => {
         // Update current page to render the correct exercises
         setCurrentPage(pageNum);
 
-        // Wait for React to re-render
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Wait for React to re-render and fonts to load
+        await new Promise(resolve => setTimeout(resolve, 300));
+        await waitForFonts();
 
-        // Capture content at high resolution
+        // Capture content at high resolution with improved settings for Arabic text
         const canvas = await window.html2canvas(printableArea, {
-          scale: 2, // Good balance between quality and performance
+          scale: 3, // Increased scale for better Arabic text rendering
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
+          letterRendering: true, // Better text rendering
+          logging: false,
+          imageTimeout: 0,
+          removeContainer: true,
         });
 
         const imgData = canvas.toDataURL('image/png', 1.0);
@@ -380,7 +405,7 @@ const App: React.FC = () => {
         const xOffset = (pdfWidth - finalWidth) / 2;
         const yOffset = (pdfHeight - finalHeight) / 2;
 
-        // Add the image to PDF
+        // Add the image to PDF with higher quality
         pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
       }
 
