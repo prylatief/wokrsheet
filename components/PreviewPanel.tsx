@@ -117,7 +117,26 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
             <div>
               <p className="text-lg font-bold text-center mb-2 text-purple-700 print:text-base">{exercise.config.title}</p>
               <p className="text-center mb-3 italic text-slate-600 text-sm print:text-xs print:mb-2">{exercise.config.instruction}</p>
-              {mazeSvg && <div className="flex justify-center" dangerouslySetInnerHTML={{ __html: mazeSvg }} />}
+              <div className="relative">
+                {/* Label Mulai - di luar labirin */}
+                <div className="flex items-center justify-start mb-2 ml-8">
+                  <div className="inline-flex items-center gap-2 bg-green-100 border-2 border-green-400 rounded-full px-4 py-1 print:px-3 print:py-0.5">
+                    <div className="w-3 h-3 bg-green-500 rounded-full print:w-2 print:h-2"></div>
+                    <span className="text-base font-bold text-green-700 print:text-sm">Mulai</span>
+                  </div>
+                </div>
+
+                {/* Labirin SVG */}
+                {mazeSvg && <div className="maze-container flex justify-center" dangerouslySetInnerHTML={{ __html: mazeSvg }} />}
+
+                {/* Label Selesai - di luar labirin */}
+                <div className="flex items-center justify-end mt-2 mr-8">
+                  <div className="inline-flex items-center gap-2 bg-red-100 border-2 border-red-400 rounded-full px-4 py-1 print:px-3 print:py-0.5">
+                    <span className="text-base font-bold text-red-700 print:text-sm">Selesai</span>
+                    <div className="w-3 h-3 bg-red-500 rounded-full print:w-2 print:h-2"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           );
       default:
