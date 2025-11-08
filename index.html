@@ -21,13 +21,40 @@
       }
       .trace-text {
         color: #d1d5db; /* gray-300 */
-        border-bottom: 2px dashed #9ca3af; /* gray-400 */
+        border-bottom: 3px solid #9ca3af; /* gray-400 - changed to solid for better PDF rendering */
         letter-spacing: 0.5em;
       }
 
-      /* Improved border for print */
+      /* Improved border for print - increased to 4px for better PDF rendering */
       .border-b-3 {
+        border-bottom-width: 4px;
+        border-bottom-style: solid;
+      }
+
+      /* Ensure answer lines render well in PDF exports */
+      .answer-line {
         border-bottom-width: 3px;
+        border-bottom-style: solid;
+        display: inline-block;
+        min-height: 1px;
+      }
+
+      /* Ensure dotted borders render well in PDF */
+      .dotted-line {
+        border-bottom-width: 2px;
+        border-bottom-style: solid;
+        border-bottom-color: currentColor;
+        background-image: repeating-linear-gradient(
+          to right,
+          currentColor 0px,
+          currentColor 4px,
+          transparent 4px,
+          transparent 8px
+        );
+        background-size: 8px 2px;
+        background-position: 0 100%;
+        background-repeat: repeat-x;
+        border-bottom: none;
       }
 
       /* Ensure emojis render properly */

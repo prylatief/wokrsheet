@@ -25,7 +25,7 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
               ))}
             </div>
             <div className="mt-5 print:mt-3">
-              <p className="text-base font-semibold print:text-sm">Jumlah: <span className="inline-block border-b-2 border-dotted border-slate-600 w-20 ml-2"></span></p>
+              <p className="text-base font-semibold print:text-sm">Jumlah: <span className="inline-block answer-line border-slate-600 w-20 ml-2"></span></p>
             </div>
           </div>
         );
@@ -63,7 +63,7 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
           <div>
             <p className="text-lg font-bold text-center mb-2 text-purple-700 print:text-base">{exercise.config.title}</p>
             <p className="text-center mb-3 italic text-slate-600 text-sm print:text-xs print:mb-2">{exercise.config.instruction}</p>
-            <div className="w-full h-56 border-2 border-dashed border-slate-400 rounded-lg bg-slate-50/50 print:h-48"></div>
+            <div className="w-full h-56 border-[3px] border-dashed border-slate-400 rounded-lg bg-slate-50/50 print:h-48"></div>
           </div>
         );
       case ExerciseType.PATTERN:
@@ -82,10 +82,10 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
             <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base print:mb-2">{exercise.config.title}</p>
             <div className="flex justify-around items-start text-xl font-comic print:text-base">
               <div className="space-y-3 print:space-y-2">
-                {exercise.config.pairs.map(p => <div key={p.id} className="text-right flex items-center justify-end">{p.item1} <span className="inline-block w-5 h-5 border-2 border-slate-600 rounded-full ml-2 print:w-4 print:h-4"></span></div>)}
+                {exercise.config.pairs.map(p => <div key={p.id} className="text-right flex items-center justify-end">{p.item1} <span className="inline-block w-5 h-5 border-[3px] border-slate-600 rounded-full ml-2 print:w-4 print:h-4"></span></div>)}
               </div>
               <div className="space-y-3 print:space-y-2">
-                {shuffledMatchingItems.map((item, i) => <div key={i} className="flex items-center"><span className="inline-block w-5 h-5 border-2 border-slate-600 rounded-full mr-2 print:w-4 print:h-4"></span> {item}</div>)}
+                {shuffledMatchingItems.map((item, i) => <div key={i} className="flex items-center"><span className="inline-block w-5 h-5 border-[3px] border-slate-600 rounded-full mr-2 print:w-4 print:h-4"></span> {item}</div>)}
               </div>
             </div>
           </div>
@@ -192,14 +192,14 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
                         <div className="text-right font-arabic text-lg leading-relaxed print:text-base" dir="rtl">
                           {verse.arabic}
                         </div>
-                        <span className="inline-block w-6 h-6 border-2 border-green-600 rounded-full shrink-0 print:w-5 print:h-5"></span>
+                        <span className="inline-block w-6 h-6 border-[3px] border-green-600 rounded-full shrink-0 print:w-5 print:h-5"></span>
                       </div>
                     ))}
                   </div>
                   <div className="space-y-3 flex-1 print:space-y-2">
                     {shuffledTranslations.map((translation, idx) => (
                       <div key={idx} className="flex items-center gap-2">
-                        <span className="inline-block w-6 h-6 border-2 border-green-600 rounded-full shrink-0 print:w-5 print:h-5"></span>
+                        <span className="inline-block w-6 h-6 border-[3px] border-green-600 rounded-full shrink-0 print:w-5 print:h-5"></span>
                         <div className="italic text-gray-700">{translation}</div>
                       </div>
                     ))}
@@ -251,7 +251,7 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
                       <span className="text-sm font-bold text-green-700 print:text-xs">Ayat {verse.verseNumber}:</span>
                       <span className="text-xs text-gray-600 italic flex-1 print:text-[10px]">{verse.translation}</span>
                     </div>
-                    <div className="w-full min-h-[60px] border-2 border-dashed border-green-400 rounded-lg bg-white p-2 print:min-h-[50px]">
+                    <div className="w-full min-h-[60px] border-[3px] border-dashed border-green-400 rounded-lg bg-white p-2 print:min-h-[50px]">
                       {/* Ruang untuk menulis */}
                     </div>
                   </div>
@@ -482,8 +482,8 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
         )}
 
         <header className="flex justify-between items-center border-b-2 border-purple-300 pb-3 mb-5 print:pb-2 print:mb-4">
-          <div className="text-base font-bold print:text-sm">Nama: <span className="inline-block border-b-2 border-dotted border-purple-400 w-40 print:w-32"></span></div>
-          <div className="text-base font-bold print:text-sm">Kelas: <span className="inline-block border-b-2 border-dotted border-purple-400 w-20 print:w-16"></span></div>
+          <div className="text-base font-bold print:text-sm">Nama: <span className="inline-block answer-line border-purple-400 w-40 print:w-32"></span></div>
+          <div className="text-base font-bold print:text-sm">Kelas: <span className="inline-block answer-line border-purple-400 w-20 print:w-16"></span></div>
         </header>
 
         <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 p-3 rounded-xl mb-6 shadow-md print:p-2 print:mb-4 print:rounded-lg">
