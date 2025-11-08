@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { Worksheet, Exercise, Theme, BorderTheme, SchoolInfo } from '../types';
 import { ExerciseType } from '../types';
 import { ExerciseForm } from './ExerciseForm';
-import { PlusIcon, PrintIcon, DownloadIcon } from './Icons';
+import { PlusIcon, DownloadIcon } from './Icons';
 
 interface ControlPanelProps {
   worksheet: Worksheet;
@@ -15,7 +15,6 @@ interface ControlPanelProps {
   onRemoveExercise: (id: string) => void;
   onMoveExerciseToPage: (id: string, pageNumber: number) => void;
   totalPages: number;
-  onPrint: () => void;
   onDownloadPdf: () => void;
   isDownloading: boolean;
 }
@@ -51,7 +50,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onRemoveExercise,
   onMoveExerciseToPage,
   totalPages,
-  onPrint,
   onDownloadPdf,
   isDownloading
 }) => {
@@ -236,27 +234,18 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-            <button
-                onClick={onPrint}
-                className="w-full flex items-center justify-center px-4 py-3 border-2 border-purple-300 text-sm font-bold rounded-xl text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-4 focus:ring-purple-200 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-            >
-                <PrintIcon className="w-5 h-5 mr-2" />
-                Cetak
-            </button>
-            <button
-                onClick={onDownloadPdf}
-                disabled={isDownloading}
-                className="w-full flex items-center justify-center px-4 py-3 border-2 border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-                {isDownloading ? (
-                    <span className="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full" role="status" aria-label="memproses"></span>
-                ) : (
-                    <DownloadIcon className="w-5 h-5 mr-2" />
-                )}
-                {isDownloading ? 'Memproses...' : 'Unduh PDF'}
-            </button>
-        </div>
+        <button
+            onClick={onDownloadPdf}
+            disabled={isDownloading}
+            className="w-full flex items-center justify-center px-5 py-4 border-2 border-transparent text-base font-bold rounded-xl text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        >
+            {isDownloading ? (
+                <span className="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full" role="status" aria-label="memproses"></span>
+            ) : (
+                <DownloadIcon className="w-6 h-6 mr-2" />
+            )}
+            {isDownloading ? 'Memproses...' : 'Unduh PDF'}
+        </button>
       </div>
     </div>
   );

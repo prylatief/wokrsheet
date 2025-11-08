@@ -256,10 +256,6 @@ const App: React.FC = () => {
     return Math.max(...worksheet.exercises.map(ex => ex.pageNumber));
   }, [worksheet.exercises]);
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   const handleDownloadPdf = () => {
     setIsExportModalOpen(true);
   };
@@ -316,32 +312,45 @@ const App: React.FC = () => {
         // Wait for React to re-render
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // A4 dimensions in pixels at 96 DPI (standard screen DPI)
-        // A4 = 210mm x 297mm = 793.7 x 1122.5 pixels at 96 DPI
-        const a4WidthPx = 794;  // 210mm at 96 DPI
-        const a4HeightPx = 1123; // 297mm at 96 DPI
-
-        // High-quality capture at exact A4 dimensions with scale for better quality
+        // Capture content at high resolution
         const canvas = await window.html2canvas(printableArea, {
-          scale: 3, // Higher scale for better quality (300 DPI effective)
+          scale: 2, // Good balance between quality and performance
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
-          width: a4WidthPx,
-          height: a4HeightPx,
-          windowWidth: a4WidthPx,
-          windowHeight: a4HeightPx,
         });
 
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const imgData = canvas.toDataURL('image/png', 1.0);
 
         // Add new page if not the first page
         if (i > 0) {
           pdf.addPage('a4', 'portrait');
         }
 
-        // Add the image to fill the entire A4 page
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+        // Calculate dimensions to fit image properly on A4 page
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const ratio = imgWidth / imgHeight;
+        const pageRatio = pdfWidth / pdfHeight;
+
+        let finalWidth = pdfWidth;
+        let finalHeight = pdfHeight;
+
+        // Fit to page while maintaining aspect ratio
+        if (ratio > pageRatio) {
+          // Image is wider than page
+          finalHeight = pdfWidth / ratio;
+        } else {
+          // Image is taller than page or same ratio
+          finalWidth = pdfHeight * ratio;
+        }
+
+        // Center the image on the page
+        const xOffset = (pdfWidth - finalWidth) / 2;
+        const yOffset = (pdfHeight - finalHeight) / 2;
+
+        // Add the image to PDF
+        pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
       }
 
       // Restore original page
@@ -392,7 +401,6 @@ const App: React.FC = () => {
             onRemoveExercise={removeExercise}
             onMoveExerciseToPage={moveExerciseToPage}
             totalPages={totalPages}
-            onPrint={handlePrint}
             onDownloadPdf={handleDownloadPdf}
             isDownloading={isDownloading}
           />
