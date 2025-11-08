@@ -182,25 +182,29 @@ interface PreviewPanelProps {
 }
 
 export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPage, totalPages, onPageChange }) => {
-  const themeClass = {
-    default: '',
-    space: 'theme-space',
-    ocean: 'theme-ocean',
-    garden: 'theme-garden',
-  }[worksheet.theme];
+  const themeClass = React.useMemo(() => {
+    return {
+      default: '',
+      space: 'theme-space',
+      ocean: 'theme-ocean',
+      garden: 'theme-garden',
+    }[worksheet.theme] || '';
+  }, [worksheet.theme]);
 
-  const borderClass = {
-    none: '',
-    simple: 'border-simple',
-    stars: 'border-stars',
-    rainbow: 'border-rainbow',
-    flowers: 'border-flowers',
-    hearts: 'border-hearts',
-    animals: 'border-animals',
-    geometric: 'border-geometric',
-    clouds: 'border-clouds',
-    music: 'border-music',
-  }[worksheet.borderTheme];
+  const borderClass = React.useMemo(() => {
+    return {
+      none: '',
+      simple: 'border-simple',
+      stars: 'border-stars',
+      rainbow: 'border-rainbow',
+      flowers: 'border-flowers',
+      hearts: 'border-hearts',
+      animals: 'border-animals',
+      geometric: 'border-geometric',
+      clouds: 'border-clouds',
+      music: 'border-music',
+    }[worksheet.borderTheme] || '';
+  }, [worksheet.borderTheme]);
 
   // Filter exercises for current page
   const currentPageExercises = React.useMemo(() => {
