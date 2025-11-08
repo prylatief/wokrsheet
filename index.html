@@ -240,8 +240,14 @@
           max-width: 21cm !important;
           page-break-inside: avoid;
           border-radius: 0 !important;
-          background: white !important;
           overflow: visible !important;
+        }
+        /* Ensure theme backgrounds print properly */
+        .theme-space,
+        .theme-ocean,
+        .theme-garden {
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
         }
         /* Ensure border decorations print properly */
         .border-simple,
