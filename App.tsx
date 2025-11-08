@@ -316,20 +316,21 @@ const App: React.FC = () => {
         // Wait for React to re-render
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Get the actual content height
-        const actualHeight = printableArea.scrollHeight;
-        const actualWidth = printableArea.scrollWidth;
+        // A4 dimensions in pixels at 96 DPI (standard screen DPI)
+        // A4 = 210mm x 297mm = 793.7 x 1122.5 pixels at 96 DPI
+        const a4WidthPx = 794;  // 210mm at 96 DPI
+        const a4HeightPx = 1123; // 297mm at 96 DPI
 
-        // High-quality capture at 300 DPI for print quality
+        // High-quality capture at exact A4 dimensions with scale for better quality
         const canvas = await window.html2canvas(printableArea, {
-          scale: 2.5,
+          scale: 3, // Higher scale for better quality (300 DPI effective)
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
-          width: actualWidth,
-          height: actualHeight,
-          windowWidth: actualWidth,
-          windowHeight: actualHeight,
+          width: a4WidthPx,
+          height: a4HeightPx,
+          windowWidth: a4WidthPx,
+          windowHeight: a4HeightPx,
         });
 
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
@@ -339,22 +340,8 @@ const App: React.FC = () => {
           pdf.addPage('a4', 'portrait');
         }
 
-        // Calculate dimensions to fit content on A4 page
-        const imgWidth = pdfWidth;
-        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-        // If content is taller than A4, scale it down to fit
-        if (imgHeight > pdfHeight) {
-          const scale = pdfHeight / imgHeight;
-          const scaledWidth = imgWidth * scale;
-          const scaledHeight = pdfHeight;
-          const xOffset = (pdfWidth - scaledWidth) / 2;
-          pdf.addImage(imgData, 'JPEG', xOffset, 0, scaledWidth, scaledHeight, undefined, 'FAST');
-        } else {
-          // Center the image vertically if it's shorter than the page
-          const yOffset = (pdfHeight - imgHeight) / 2;
-          pdf.addImage(imgData, 'JPEG', 0, yOffset, imgWidth, imgHeight, undefined, 'FAST');
-        }
+        // Add the image to fill the entire A4 page
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
       }
 
       // Restore original page
