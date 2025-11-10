@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { ControlPanel } from './components/ControlPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { ExportOptionsModal } from './components/ExportOptionsModal';
+import { DownloadProgressModal } from './components/DownloadProgressModal';
 import type { Worksheet, Exercise, Theme, BorderTheme, SchoolInfo } from './types';
 import { ExerciseType, coloringPages, mazes, juzAmmaData } from './types';
 
@@ -164,6 +165,7 @@ const App: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   const updateTitle = useCallback((newTitle: string) => {
     setWorksheet(prev => ({ ...prev, title: newTitle }));
@@ -314,6 +316,8 @@ const App: React.FC = () => {
     endPage?: number
   ) => {
     setIsDownloading(true);
+    setDownloadProgress(0);
+
     const printableArea = document.getElementById('printable-area');
     if (!printableArea) {
       console.error('Printable area not found!');
@@ -322,8 +326,12 @@ const App: React.FC = () => {
     }
 
     try {
+      // Initial progress: 5%
+      setDownloadProgress(5);
+
       // Ensure all fonts (especially Arabic) are loaded
       await waitForFonts();
+      setDownloadProgress(10);
 
       // Determine which pages to export
       let pagesToExport: number[] = [];
@@ -338,6 +346,8 @@ const App: React.FC = () => {
         );
       }
 
+      setDownloadProgress(15);
+
       // Initialize PDF with A4 dimensions
       const pdf = new window.jspdf.jsPDF({
         orientation: 'portrait',
@@ -346,12 +356,17 @@ const App: React.FC = () => {
         compress: true,
       });
 
+      setDownloadProgress(20);
+
       // A4 dimensions in mm: 210 x 297
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
       // Store original page
       const originalPage = currentPage;
+
+      // Calculate progress increment per page (from 20% to 90%)
+      const progressPerPage = 70 / pagesToExport.length;
 
       // Generate PDF for each page
       for (let i = 0; i < pagesToExport.length; i++) {
@@ -364,6 +379,9 @@ const App: React.FC = () => {
         await new Promise(resolve => setTimeout(resolve, 300));
         await waitForFonts();
 
+        // Update progress for rendering
+        setDownloadProgress(Math.floor(20 + (i * progressPerPage * 0.3)));
+
         // Capture content at high resolution with improved settings for Arabic text
         const canvas = await window.html2canvas(printableArea, {
           scale: 3, // Increased scale for better Arabic text rendering
@@ -375,6 +393,9 @@ const App: React.FC = () => {
           imageTimeout: 0,
           removeContainer: true,
         });
+
+        // Update progress for canvas processing
+        setDownloadProgress(Math.floor(20 + (i * progressPerPage * 0.6)));
 
         const imgData = canvas.toDataURL('image/png', 1.0);
 
@@ -407,19 +428,32 @@ const App: React.FC = () => {
 
         // Add the image to PDF with higher quality
         pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
+
+        // Update progress after adding page
+        setDownloadProgress(Math.floor(20 + ((i + 1) * progressPerPage)));
       }
 
       // Restore original page
       setCurrentPage(originalPage);
 
+      // Final processing
+      setDownloadProgress(95);
+
       // Generate filename
       const fileName = `${worksheet.title.replace(/\s+/g, '_').toLowerCase() || 'worksheet'}.pdf`;
       pdf.save(fileName);
+
+      // Complete!
+      setDownloadProgress(100);
+
+      // Keep at 100% for a moment before closing
+      await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert('Terjadi kesalahan saat membuat PDF. Silakan coba lagi.');
     } finally {
       setIsDownloading(false);
+      setDownloadProgress(0);
     }
   };
 
@@ -477,6 +511,11 @@ const App: React.FC = () => {
         onExport={handleExportPdf}
         totalPages={totalPages}
         currentPage={currentPage}
+      />
+
+      <DownloadProgressModal
+        isOpen={isDownloading}
+        progress={downloadProgress}
       />
     </div>
   );
