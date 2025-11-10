@@ -54,6 +54,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   isDownloading
 }) => {
   const [isAddMenuOpen, setAddMenuOpen] = useState(false);
+  const [selectedPage, setSelectedPage] = useState<number | 'all'>(1);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -192,18 +193,47 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           <span className="text-3xl">📚</span>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Latihan</h2>
         </div>
+
+        {/* Page Selector */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold text-purple-700 mb-2 flex items-center gap-1">
+            <span>📄</span> Tampilkan Latihan
+          </label>
+          <select
+            value={selectedPage}
+            onChange={(e) => setSelectedPage(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+            className="w-full px-4 py-3 bg-white border-2 border-purple-300 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-purple-300 focus:border-purple-500 text-base font-medium transition-all duration-200"
+          >
+            <option value="all">Semua Halaman ({worksheet.exercises.length} latihan)</option>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => {
+              const exercisesInPage = worksheet.exercises.filter(ex => ex.pageNumber === pageNum).length;
+              return (
+                <option key={pageNum} value={pageNum}>
+                  Halaman {pageNum} ({exercisesInPage} latihan)
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
         <div className="space-y-6">
-          {worksheet.exercises.map((exercise, index) => (
-            <ExerciseForm
-              key={exercise.id}
-              exercise={exercise}
-              index={index}
-              onUpdate={onUpdateExercise}
-              onRemove={onRemoveExercise}
-              onMoveToPage={onMoveExerciseToPage}
-              totalPages={totalPages}
-            />
-          ))}
+          {worksheet.exercises
+            .filter(exercise => selectedPage === 'all' || exercise.pageNumber === selectedPage)
+            .map((exercise) => {
+              // Get original index from all exercises
+              const originalIndex = worksheet.exercises.findIndex(ex => ex.id === exercise.id);
+              return (
+                <ExerciseForm
+                  key={exercise.id}
+                  exercise={exercise}
+                  index={originalIndex}
+                  onUpdate={onUpdateExercise}
+                  onRemove={onRemoveExercise}
+                  onMoveToPage={onMoveExerciseToPage}
+                  totalPages={totalPages}
+                />
+              );
+            })}
         </div>
       </div>
 
