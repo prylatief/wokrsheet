@@ -14,7 +14,7 @@
 3. Aktifkan OAuth providers yang diinginkan (Google, GitHub, dll)
 4. Konfigurasi redirect URLs:
    - Development: `http://localhost:3000`
-   - Production: [URL production Anda]
+   - Production: `https://wokrsheet.vercel.app`
 
 ### 2. Environment Variables (Opsional)
 
