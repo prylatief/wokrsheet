@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@stackframe/stack": "^2.8.49",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
