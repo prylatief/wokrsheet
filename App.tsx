@@ -197,7 +197,7 @@ const App: React.FC = () => {
         newExercise = { id: newId, type, config: { title: 'Pengurangan', num1: 5, num2: 2, showHelpers: true, helperEmoji: '🎈' }, pageNumber: currentPage };
         break;
       case ExerciseType.TRACING:
-        newExercise = { id: newId, type, config: { title: 'Tebalkan Teks', text: 'Halo' }, pageNumber: currentPage };
+        newExercise = { id: newId, type, config: { title: 'Tebalkan Teks', text: 'ABC' }, pageNumber: currentPage };
         break;
       case ExerciseType.DRAWING:
         newExercise = { id: newId, type, config: { title: 'Ayo Menggambar', instruction: 'Gambarlah hewan kesukaanmu' }, pageNumber: currentPage };
