@@ -265,19 +265,18 @@ const App: React.FC = () => {
           pageNumber: currentPage
         };
         break;
-      case ExerciseType.BLOCK_CODING:
+      case ExerciseType.IF_THEN_LOGIC:
         newExercise = {
           id: newId,
           type,
           config: {
-            title: 'Latihan Koding Blok',
-            blocks: [
-              { id: crypto.randomUUID(), command: 'move_forward', emoji: '⬆️', label: 'Maju' },
-              { id: crypto.randomUUID(), command: 'turn_right', emoji: '➡️', label: 'Belok Kanan' },
-              { id: crypto.randomUUID(), command: 'move_forward', emoji: '⬆️', label: 'Maju' }
+            title: 'Latihan Logika Jika-Maka',
+            rules: [
+              { id: crypto.randomUUID(), condition: 'Jika angka genap', action: 'Warnai biru 🔵', emoji: '🔵' },
+              { id: crypto.randomUUID(), condition: 'Jika angka ganjil', action: 'Warnai merah 🔴', emoji: '🔴' }
             ],
-            instruction: 'Susun blok untuk sampai ke tujuan',
-            gridSize: 5
+            instruction: 'Ikuti aturan di bawah untuk mewarnai kotak sesuai angkanya',
+            items: 10
           },
           pageNumber: currentPage
         };

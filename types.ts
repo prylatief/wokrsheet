@@ -13,7 +13,7 @@ export enum ExerciseType {
   JUZ_AMMA = 'Latihan Juz Amma',
   COLOR_CODING = 'Koding Warna',
   SEQUENCE_CODING = 'Koding Urutan',
-  BLOCK_CODING = 'Koding Blok',
+  IF_THEN_LOGIC = 'Logika Jika-Maka',
   PIXEL_ART = 'Pixel Art',
 }
 
@@ -113,19 +113,17 @@ interface SequenceCodingConfig extends BaseExerciseConfig {
   instruction: string;
 }
 
-export type BlockCodingCommand = 'move_forward' | 'turn_left' | 'turn_right' | 'jump' | 'repeat';
-
-export interface CodeBlock {
+export interface IfThenRule {
   id: string;
-  command: BlockCodingCommand;
-  emoji: string;
-  label: string;
+  condition: string; // e.g., "Jika angka genap", "Jika di baris pertama"
+  action: string; // e.g., "Warnai biru", "Gambar bintang"
+  emoji?: string;
 }
 
-interface BlockCodingConfig extends BaseExerciseConfig {
-  blocks: CodeBlock[];
+interface IfThenLogicConfig extends BaseExerciseConfig {
+  rules: IfThenRule[];
   instruction: string;
-  gridSize?: number;
+  items: number; // Jumlah item untuk diterapkan rules (misalnya 10 kotak)
 }
 
 interface PixelArtConfig extends BaseExerciseConfig {
@@ -150,7 +148,7 @@ export type Exercise =
   | { id: string; type: ExerciseType.JUZ_AMMA; config: JuzAmmaConfig; pageNumber: number }
   | { id: string; type: ExerciseType.COLOR_CODING; config: ColorCodingConfig; pageNumber: number }
   | { id: string; type: ExerciseType.SEQUENCE_CODING; config: SequenceCodingConfig; pageNumber: number }
-  | { id: string; type: ExerciseType.BLOCK_CODING; config: BlockCodingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.IF_THEN_LOGIC; config: IfThenLogicConfig; pageNumber: number }
   | { id: string; type: ExerciseType.PIXEL_ART; config: PixelArtConfig; pageNumber: number };
 
 export type Theme = 'default' | 'space' | 'ocean' | 'garden';

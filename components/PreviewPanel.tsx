@@ -367,47 +367,48 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
           </div>
         );
 
-      case ExerciseType.BLOCK_CODING:
-        const { blocks, instruction: blockInstruction, gridSize } = exercise.config;
+      case ExerciseType.IF_THEN_LOGIC:
+        const { rules, instruction: ifThenInstruction, items } = exercise.config;
 
         return (
           <div>
             <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base">{exercise.config.title}</p>
-            <p className="text-sm text-center mb-4 text-gray-700 print:text-xs">{blockInstruction}</p>
+            <p className="text-sm text-center mb-4 text-gray-700 print:text-xs">{ifThenInstruction}</p>
 
-            <div className="flex justify-between items-start gap-6">
-              {/* Grid */}
-              <div className="flex-1">
-                <p className="text-sm font-bold text-center mb-2 text-blue-700 print:text-xs">Papan:</p>
-                <div
-                  className="grid gap-1 w-fit mx-auto"
-                  style={{
-                    gridTemplateColumns: `repeat(${gridSize || 5}, 1fr)`,
-                  }}
-                >
-                  {Array.from({ length: (gridSize || 5) * (gridSize || 5) }).map((_, idx) => (
-                    <div
-                      key={idx}
-                      className="w-8 h-8 border-2 border-gray-400 bg-white print:w-6 print:h-6"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Blocks */}
-              <div className="flex-1">
-                <p className="text-sm font-bold text-center mb-2 text-blue-700 print:text-xs">Blok Kode:</p>
-                <div className="space-y-2">
-                  {blocks?.map((block) => (
-                    <div
-                      key={block.id}
-                      className="flex items-center gap-3 bg-blue-500 text-white p-3 rounded-lg shadow-md print:p-2"
-                    >
-                      <span className="text-2xl print:text-xl">{block.emoji}</span>
-                      <span className="font-medium print:text-sm">{block.label}</span>
+            {/* Rules Box */}
+            <div className="bg-purple-50 border-4 border-purple-300 rounded-lg p-4 mb-4">
+              <p className="text-sm font-bold text-center mb-3 text-purple-700 print:text-xs">📋 Aturan:</p>
+              <div className="space-y-2">
+                {rules?.map((rule, idx) => (
+                  <div key={rule.id} className="bg-white p-3 rounded-lg border-2 border-purple-200">
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-purple-600">Aturan {idx + 1}:</span>
                     </div>
-                  ))}
-                </div>
+                    <div className="mt-1 space-y-1 text-sm">
+                      <p className="text-blue-700">
+                        <span className="font-semibold">JIKA:</span> {rule.condition}
+                      </p>
+                      <p className="text-green-700">
+                        <span className="font-semibold">MAKA:</span> {rule.action}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Items to apply rules */}
+            <div className="mt-4">
+              <p className="text-sm font-bold text-center mb-2 text-purple-700 print:text-xs">Terapkan aturan pada kotak di bawah:</p>
+              <div className="grid grid-cols-5 gap-3 max-w-md mx-auto">
+                {Array.from({ length: items || 10 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="relative w-16 h-16 border-4 border-gray-400 bg-white rounded-lg flex items-center justify-center print:w-12 print:h-12"
+                  >
+                    <span className="text-2xl font-bold text-gray-600 print:text-xl">{idx + 1}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -514,9 +515,10 @@ const estimateExerciseHeight = (exercise: Exercise): number => {
     case ExerciseType.SEQUENCE_CODING:
       const stepCount = exercise.config.steps?.length || 3;
       return baseHeight + 8 + (stepCount * 4);
-    case ExerciseType.BLOCK_CODING:
-      const blockCount = exercise.config.blocks?.length || 4;
-      return baseHeight + 12 + Math.max(blockCount * 3, 15);
+    case ExerciseType.IF_THEN_LOGIC:
+      const ruleCount = exercise.config.rules?.length || 2;
+      const itemCount = exercise.config.items || 10;
+      return baseHeight + 12 + (ruleCount * 4) + Math.ceil(itemCount / 5) * 4;
     case ExerciseType.PIXEL_ART:
       const rows = exercise.config.gridRows || 8;
       const cols = exercise.config.gridCols || 8;
