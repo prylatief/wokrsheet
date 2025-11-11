@@ -262,6 +262,200 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
         }
 
         return null;
+
+      case ExerciseType.COLOR_CODING:
+        const { exerciseType: colorType, colors, instruction: colorInstruction } = exercise.config;
+
+        if (colorType === 'sequence') {
+          return (
+            <div>
+              <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base">{exercise.config.title}</p>
+              <p className="text-sm text-center mb-4 text-gray-700 print:text-xs">{colorInstruction}</p>
+              <div className="flex justify-center gap-4 flex-wrap">
+                {colors?.map((color, idx) => (
+                  <div key={idx} className="text-center">
+                    <div
+                      className="w-16 h-16 rounded-lg border-4 border-gray-800 shadow-lg print:w-12 print:h-12"
+                      style={{ backgroundColor: color }}
+                    />
+                    <div className="mt-2 w-12 h-8 border-[3px] border-dashed border-gray-400 rounded mx-auto flex items-center justify-center text-gray-500 font-bold print:text-xs">
+                      ?
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        if (colorType === 'matching') {
+          const shuffledColors = [...(colors || [])].sort(() => Math.random() - 0.5);
+          return (
+            <div>
+              <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base">{exercise.config.title}</p>
+              <p className="text-sm text-center mb-4 text-gray-700 print:text-xs">{colorInstruction}</p>
+              <div className="flex justify-around gap-8">
+                <div className="space-y-3">
+                  {colors?.map((color, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div
+                        className="w-12 h-12 rounded-lg border-4 border-gray-800 print:w-10 print:h-10"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="inline-block w-6 h-6 border-[3px] border-purple-600 rounded-full print:w-5 print:h-5"></span>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-3">
+                  {shuffledColors.map((color, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="inline-block w-6 h-6 border-[3px] border-purple-600 rounded-full print:w-5 print:h-5"></span>
+                      <div
+                        className="w-12 h-12 rounded-lg border-4 border-gray-800 print:w-10 print:h-10"
+                        style={{ backgroundColor: color }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (colorType === 'pattern') {
+          return (
+            <div>
+              <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base">{exercise.config.title}</p>
+              <p className="text-sm text-center mb-4 text-gray-700 print:text-xs">{colorInstruction}</p>
+              <div className="flex justify-center items-center gap-3">
+                {colors?.slice(0, -1).map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="w-14 h-14 rounded-lg border-4 border-gray-800 shadow-lg print:w-12 print:h-12"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+                <div className="w-14 h-14 rounded-lg border-4 border-dashed border-gray-500 flex items-center justify-center text-3xl print:w-12 print:h-12">
+                  ?
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return null;
+
+      case ExerciseType.SEQUENCE_CODING:
+        const { steps, instruction: seqInstruction } = exercise.config;
+        const shuffledSteps = [...(steps || [])].sort(() => Math.random() - 0.5);
+
+        return (
+          <div>
+            <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base">{exercise.config.title}</p>
+            <p className="text-sm text-center mb-4 text-gray-700 print:text-xs">{seqInstruction}</p>
+            <div className="space-y-3">
+              {shuffledSteps.map((step, idx) => (
+                <div key={step.id} className="flex items-center gap-4 bg-blue-50 p-3 rounded-lg border-2 border-blue-300 print:p-2">
+                  <div className="w-10 h-10 border-[3px] border-dashed border-blue-500 rounded flex items-center justify-center font-bold text-lg print:w-8 print:h-8 print:text-sm">
+                    {idx + 1}
+                  </div>
+                  <span className="text-3xl print:text-2xl">{step.icon}</span>
+                  <span className="flex-1 font-medium text-gray-800 print:text-sm">{step.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case ExerciseType.BLOCK_CODING:
+        const { blocks, instruction: blockInstruction, gridSize } = exercise.config;
+
+        return (
+          <div>
+            <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base">{exercise.config.title}</p>
+            <p className="text-sm text-center mb-4 text-gray-700 print:text-xs">{blockInstruction}</p>
+
+            <div className="flex justify-between items-start gap-6">
+              {/* Grid */}
+              <div className="flex-1">
+                <p className="text-sm font-bold text-center mb-2 text-blue-700 print:text-xs">Papan:</p>
+                <div
+                  className="grid gap-1 w-fit mx-auto"
+                  style={{
+                    gridTemplateColumns: `repeat(${gridSize || 5}, 1fr)`,
+                  }}
+                >
+                  {Array.from({ length: (gridSize || 5) * (gridSize || 5) }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="w-8 h-8 border-2 border-gray-400 bg-white print:w-6 print:h-6"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Blocks */}
+              <div className="flex-1">
+                <p className="text-sm font-bold text-center mb-2 text-blue-700 print:text-xs">Blok Kode:</p>
+                <div className="space-y-2">
+                  {blocks?.map((block) => (
+                    <div
+                      key={block.id}
+                      className="flex items-center gap-3 bg-blue-500 text-white p-3 rounded-lg shadow-md print:p-2"
+                    >
+                      <span className="text-2xl print:text-xl">{block.emoji}</span>
+                      <span className="font-medium print:text-sm">{block.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case ExerciseType.PIXEL_ART:
+        const { gridRows, gridCols, colorPalette, instruction: pixelInstruction } = exercise.config;
+
+        return (
+          <div>
+            <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base">{exercise.config.title}</p>
+            <p className="text-sm text-center mb-4 text-gray-700 print:text-xs">{pixelInstruction}</p>
+
+            <div className="flex justify-center items-start gap-6">
+              {/* Grid */}
+              <div>
+                <div
+                  className="grid gap-0 border-2 border-gray-800 w-fit"
+                  style={{
+                    gridTemplateColumns: `repeat(${gridCols || 8}, 1fr)`,
+                  }}
+                >
+                  {Array.from({ length: (gridRows || 8) * (gridCols || 8) }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="w-6 h-6 border border-gray-300 bg-white print:w-5 print:h-5"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Color Palette */}
+              <div>
+                <p className="text-sm font-bold text-center mb-2 text-purple-700 print:text-xs">Palet Warna:</p>
+                <div className="space-y-2">
+                  {colorPalette?.map((color, idx) => (
+                    <div
+                      key={idx}
+                      className="w-12 h-12 rounded-lg border-4 border-gray-800 shadow-md print:w-10 print:h-10"
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -314,6 +508,19 @@ const estimateExerciseHeight = (exercise: Exercise): number => {
       }
       // fill_blank
       return baseHeight + 8 + (verseCount * 4);
+    case ExerciseType.COLOR_CODING:
+      const colorCount = exercise.config.colors?.length || 3;
+      return baseHeight + 10 + Math.ceil(colorCount / 3) * 3;
+    case ExerciseType.SEQUENCE_CODING:
+      const stepCount = exercise.config.steps?.length || 3;
+      return baseHeight + 8 + (stepCount * 4);
+    case ExerciseType.BLOCK_CODING:
+      const blockCount = exercise.config.blocks?.length || 4;
+      return baseHeight + 12 + Math.max(blockCount * 3, 15);
+    case ExerciseType.PIXEL_ART:
+      const rows = exercise.config.gridRows || 8;
+      const cols = exercise.config.gridCols || 8;
+      return baseHeight + 12 + Math.ceil((rows * cols) / 20);
     default:
       return baseHeight + 10;
   }

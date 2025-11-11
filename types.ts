@@ -11,6 +11,10 @@ export enum ExerciseType {
   COLORING = 'Area Mewarnai',
   MAZE = 'Labirin Sederhana',
   JUZ_AMMA = 'Latihan Juz Amma',
+  COLOR_CODING = 'Koding Warna',
+  SEQUENCE_CODING = 'Koding Urutan',
+  BLOCK_CODING = 'Koding Blok',
+  PIXEL_ART = 'Pixel Art',
 }
 
 interface BaseExerciseConfig {
@@ -89,6 +93,49 @@ interface JuzAmmaConfig extends BaseExerciseConfig {
   matchingPairs?: { arabic: string; translation: string }[]; // untuk matching
 }
 
+// --- CODING EXERCISES ---
+export type ColorCodingExerciseType = 'sequence' | 'matching' | 'pattern';
+
+interface ColorCodingConfig extends BaseExerciseConfig {
+  exerciseType: ColorCodingExerciseType;
+  colors: string[]; // Array of colors for the exercise
+  instruction: string;
+}
+
+export interface SequenceStep {
+  id: string;
+  icon: string; // emoji or text
+  label: string;
+}
+
+interface SequenceCodingConfig extends BaseExerciseConfig {
+  steps: SequenceStep[];
+  instruction: string;
+}
+
+export type BlockCodingCommand = 'move_forward' | 'turn_left' | 'turn_right' | 'jump' | 'repeat';
+
+export interface CodeBlock {
+  id: string;
+  command: BlockCodingCommand;
+  emoji: string;
+  label: string;
+}
+
+interface BlockCodingConfig extends BaseExerciseConfig {
+  blocks: CodeBlock[];
+  instruction: string;
+  gridSize?: number;
+}
+
+interface PixelArtConfig extends BaseExerciseConfig {
+  gridRows: number;
+  gridCols: number;
+  colorPalette: string[];
+  instruction: string;
+  prefilledCells?: { row: number; col: number; color: string }[];
+}
+
 export type Exercise =
   | { id: string; type: ExerciseType.COUNTING; config: CountingConfig; pageNumber: number }
   | { id: string; type: ExerciseType.ADDITION; config: AdditionConfig; pageNumber: number }
@@ -100,7 +147,11 @@ export type Exercise =
   | { id: string; type: ExerciseType.SPELLING; config: SpellingConfig; pageNumber: number }
   | { id: string; type: ExerciseType.COLORING; config: ColoringConfig; pageNumber: number }
   | { id: string; type: ExerciseType.MAZE; config: MazeConfig; pageNumber: number }
-  | { id: string; type: ExerciseType.JUZ_AMMA; config: JuzAmmaConfig; pageNumber: number };
+  | { id: string; type: ExerciseType.JUZ_AMMA; config: JuzAmmaConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.COLOR_CODING; config: ColorCodingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.SEQUENCE_CODING; config: SequenceCodingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.BLOCK_CODING; config: BlockCodingConfig; pageNumber: number }
+  | { id: string; type: ExerciseType.PIXEL_ART; config: PixelArtConfig; pageNumber: number };
 
 export type Theme = 'default' | 'space' | 'ocean' | 'garden';
 
