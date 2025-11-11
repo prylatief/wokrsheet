@@ -3,7 +3,6 @@ import { ControlPanel } from './components/ControlPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { ExportOptionsModal } from './components/ExportOptionsModal';
 import { DownloadProgressModal } from './components/DownloadProgressModal';
-import { JWTDecoder } from './components/JWTDecoder';
 import type { Worksheet, Exercise, Theme, BorderTheme, SchoolInfo } from './types';
 import { ExerciseType, coloringPages, mazes, juzAmmaData } from './types';
 
@@ -480,12 +479,6 @@ const App: React.FC = () => {
         </div>
       </header>
       <main className="container mx-auto p-4 md:p-8">
-        {/* JWT Decoder Section */}
-        <div className="mb-8 no-print">
-          <JWTDecoder />
-        </div>
-
-        {/* Worksheet Generator Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 no-print">
           <ControlPanel
