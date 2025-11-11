@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import type { Exercise, MatchingPair, JuzAmmaVerse } from '../types';
+import type { Exercise, MatchingPair, JuzAmmaVerse, SequenceStep, CodeBlock, ColorCodingExerciseType, BlockCodingCommand } from '../types';
 import { ExerciseType, coloringPages, mazes, juzAmmaData } from '../types';
 import { TrashIcon, PlusIcon } from './Icons';
 
@@ -315,6 +315,272 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onU
             )}
           </>
         );
+
+      case ExerciseType.COLOR_CODING:
+        const colorCodingTypes = [
+          { key: 'sequence', name: 'Urutan Warna' },
+          { key: 'matching', name: 'Cocokkan Warna' },
+          { key: 'pattern', name: 'Pola Warna' }
+        ];
+
+        const commonColors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080', '#FFC0CB', '#A52A2A'];
+
+        return (
+          <>
+            <InputField label="Instruksi" id={`color-instruction-${exercise.id}`}>
+              <TextInput
+                id={`color-instruction-${exercise.id}`}
+                value={exercise.config.instruction}
+                onChange={e => handleConfigChange('instruction', e.target.value)}
+                placeholder="Contoh: Urutkan warna dari merah ke biru"
+              />
+            </InputField>
+
+            <InputField label="Jenis Latihan" id={`color-type-${exercise.id}`}>
+              <SelectInput
+                id={`color-type-${exercise.id}`}
+                value={exercise.config.exerciseType}
+                onChange={e => handleConfigChange('exerciseType', e.target.value as ColorCodingExerciseType)}
+                options={colorCodingTypes}
+              />
+            </InputField>
+
+            <div>
+              <label className="block text-sm font-bold text-orange-700 mb-2">Warna (klik untuk toggle)</label>
+              <div className="grid grid-cols-5 gap-2">
+                {commonColors.map(color => {
+                  const isSelected = exercise.config.colors?.includes(color);
+                  return (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => {
+                        const currentColors = exercise.config.colors || [];
+                        const newColors = isSelected
+                          ? currentColors.filter(c => c !== color)
+                          : [...currentColors, color];
+                        handleConfigChange('colors', newColors);
+                      }}
+                      className={`h-12 rounded-lg border-4 transition-all duration-200 ${
+                        isSelected ? 'border-orange-500 scale-95' : 'border-gray-300 hover:border-orange-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Warna terpilih: {exercise.config.colors?.length || 0}</p>
+            </div>
+          </>
+        );
+
+      case ExerciseType.SEQUENCE_CODING:
+        return (
+          <>
+            <InputField label="Instruksi" id={`seq-instruction-${exercise.id}`}>
+              <TextInput
+                id={`seq-instruction-${exercise.id}`}
+                value={exercise.config.instruction}
+                onChange={e => handleConfigChange('instruction', e.target.value)}
+                placeholder="Contoh: Urutkan langkah menyikat gigi yang benar"
+              />
+            </InputField>
+
+            <div>
+              <label className="block text-sm font-bold text-orange-700 mb-2">Langkah-langkah</label>
+              {exercise.config.steps?.map((step: SequenceStep, idx: number) => (
+                <div key={step.id} className="flex gap-2 mb-2 items-center">
+                  <span className="text-orange-600 font-bold">{idx + 1}.</span>
+                  <input
+                    type="text"
+                    value={step.icon}
+                    onChange={e => {
+                      const newSteps = [...exercise.config.steps];
+                      newSteps[idx] = { ...step, icon: e.target.value };
+                      handleConfigChange('steps', newSteps);
+                    }}
+                    placeholder="Emoji"
+                    className="w-16 px-2 py-1 border-2 border-orange-300 rounded text-xl text-center"
+                  />
+                  <input
+                    type="text"
+                    value={step.label}
+                    onChange={e => {
+                      const newSteps = [...exercise.config.steps];
+                      newSteps[idx] = { ...step, label: e.target.value };
+                      handleConfigChange('steps', newSteps);
+                    }}
+                    placeholder="Deskripsi langkah"
+                    className="flex-1 px-3 py-2 border-2 border-orange-300 rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newSteps = exercise.config.steps.filter((_: SequenceStep, i: number) => i !== idx);
+                      handleConfigChange('steps', newSteps);
+                    }}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  const newStep: SequenceStep = {
+                    id: `step-${Date.now()}`,
+                    icon: '⭐',
+                    label: 'Langkah baru'
+                  };
+                  handleConfigChange('steps', [...(exercise.config.steps || []), newStep]);
+                }}
+                className="mt-2 w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center justify-center gap-2"
+              >
+                <PlusIcon /> Tambah Langkah
+              </button>
+            </div>
+          </>
+        );
+
+      case ExerciseType.BLOCK_CODING:
+        const blockCommands: { command: BlockCodingCommand; emoji: string; label: string }[] = [
+          { command: 'move_forward', emoji: '⬆️', label: 'Maju' },
+          { command: 'turn_left', emoji: '⬅️', label: 'Belok Kiri' },
+          { command: 'turn_right', emoji: '➡️', label: 'Belok Kanan' },
+          { command: 'jump', emoji: '⬆️', label: 'Lompat' },
+          { command: 'repeat', emoji: '🔄', label: 'Ulangi' }
+        ];
+
+        return (
+          <>
+            <InputField label="Instruksi" id={`block-instruction-${exercise.id}`}>
+              <TextInput
+                id={`block-instruction-${exercise.id}`}
+                value={exercise.config.instruction}
+                onChange={e => handleConfigChange('instruction', e.target.value)}
+                placeholder="Contoh: Susun blok untuk sampai ke tujuan"
+              />
+            </InputField>
+
+            <div>
+              <label className="block text-sm font-bold text-orange-700 mb-2">Blok Kode</label>
+              {exercise.config.blocks?.map((block: CodeBlock, idx: number) => (
+                <div key={block.id} className="flex gap-2 mb-2 items-center bg-blue-50 p-2 rounded-lg">
+                  <span className="text-orange-600 font-bold">{idx + 1}.</span>
+                  <span className="text-2xl">{block.emoji}</span>
+                  <span className="flex-1 font-medium">{block.label}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newBlocks = exercise.config.blocks.filter((_: CodeBlock, i: number) => i !== idx);
+                      handleConfigChange('blocks', newBlocks);
+                    }}
+                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+
+              <div className="mt-3">
+                <p className="text-sm font-medium text-slate-600 mb-2">Tambah Blok:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {blockCommands.map(cmd => (
+                    <button
+                      key={cmd.command}
+                      type="button"
+                      onClick={() => {
+                        const newBlock: CodeBlock = {
+                          id: `block-${Date.now()}-${Math.random()}`,
+                          command: cmd.command,
+                          emoji: cmd.emoji,
+                          label: cmd.label
+                        };
+                        handleConfigChange('blocks', [...(exercise.config.blocks || []), newBlock]);
+                      }}
+                      className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
+                    >
+                      <span className="text-xl">{cmd.emoji}</span>
+                      <span className="text-sm">{cmd.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <InputField label="Ukuran Grid (opsional)" id={`block-grid-${exercise.id}`}>
+              <NumberInput
+                id={`block-grid-${exercise.id}`}
+                value={exercise.config.gridSize || 5}
+                onChange={e => handleConfigChange('gridSize', parseInt(e.target.value))}
+              />
+            </InputField>
+          </>
+        );
+
+      case ExerciseType.PIXEL_ART:
+        const pixelColors = ['#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+
+        return (
+          <>
+            <InputField label="Instruksi" id={`pixel-instruction-${exercise.id}`}>
+              <TextInput
+                id={`pixel-instruction-${exercise.id}`}
+                value={exercise.config.instruction}
+                onChange={e => handleConfigChange('instruction', e.target.value)}
+                placeholder="Contoh: Warnai kotak sesuai petunjuk"
+              />
+            </InputField>
+
+            <div className="grid grid-cols-2 gap-4">
+              <InputField label="Jumlah Baris" id={`pixel-rows-${exercise.id}`}>
+                <NumberInput
+                  id={`pixel-rows-${exercise.id}`}
+                  value={exercise.config.gridRows}
+                  onChange={e => handleConfigChange('gridRows', parseInt(e.target.value))}
+                />
+              </InputField>
+
+              <InputField label="Jumlah Kolom" id={`pixel-cols-${exercise.id}`}>
+                <NumberInput
+                  id={`pixel-cols-${exercise.id}`}
+                  value={exercise.config.gridCols}
+                  onChange={e => handleConfigChange('gridCols', parseInt(e.target.value))}
+                />
+              </InputField>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-orange-700 mb-2">Palet Warna</label>
+              <div className="grid grid-cols-4 gap-2">
+                {pixelColors.map(color => {
+                  const isSelected = exercise.config.colorPalette?.includes(color);
+                  return (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => {
+                        const currentPalette = exercise.config.colorPalette || [];
+                        const newPalette = isSelected
+                          ? currentPalette.filter(c => c !== color)
+                          : [...currentPalette, color];
+                        handleConfigChange('colorPalette', newPalette);
+                      }}
+                      className={`h-10 rounded-lg border-4 transition-all duration-200 ${
+                        isSelected ? 'border-orange-500 scale-95' : 'border-gray-300 hover:border-orange-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        );
+
       default:
         return null;
     }

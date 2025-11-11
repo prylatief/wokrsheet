@@ -236,6 +236,67 @@ const App: React.FC = () => {
           pageNumber: currentPage
         };
         break;
+      case ExerciseType.COLOR_CODING:
+        newExercise = {
+          id: newId,
+          type,
+          config: {
+            title: 'Latihan Koding Warna',
+            exerciseType: 'sequence',
+            colors: ['#FF0000', '#00FF00', '#0000FF'],
+            instruction: 'Urutkan warna dari merah ke biru'
+          },
+          pageNumber: currentPage
+        };
+        break;
+      case ExerciseType.SEQUENCE_CODING:
+        newExercise = {
+          id: newId,
+          type,
+          config: {
+            title: 'Latihan Urutan Langkah',
+            steps: [
+              { id: crypto.randomUUID(), icon: '🦷', label: 'Ambil sikat gigi' },
+              { id: crypto.randomUUID(), icon: '🧴', label: 'Beri pasta gigi' },
+              { id: crypto.randomUUID(), icon: '😁', label: 'Sikat gigi' }
+            ],
+            instruction: 'Urutkan langkah menyikat gigi yang benar'
+          },
+          pageNumber: currentPage
+        };
+        break;
+      case ExerciseType.BLOCK_CODING:
+        newExercise = {
+          id: newId,
+          type,
+          config: {
+            title: 'Latihan Koding Blok',
+            blocks: [
+              { id: crypto.randomUUID(), command: 'move_forward', emoji: '⬆️', label: 'Maju' },
+              { id: crypto.randomUUID(), command: 'turn_right', emoji: '➡️', label: 'Belok Kanan' },
+              { id: crypto.randomUUID(), command: 'move_forward', emoji: '⬆️', label: 'Maju' }
+            ],
+            instruction: 'Susun blok untuk sampai ke tujuan',
+            gridSize: 5
+          },
+          pageNumber: currentPage
+        };
+        break;
+      case ExerciseType.PIXEL_ART:
+        newExercise = {
+          id: newId,
+          type,
+          config: {
+            title: 'Latihan Pixel Art',
+            gridRows: 8,
+            gridCols: 8,
+            colorPalette: ['#000000', '#FF0000', '#00FF00', '#0000FF'],
+            instruction: 'Warnai kotak sesuai petunjuk untuk membuat gambar',
+            prefilledCells: []
+          },
+          pageNumber: currentPage
+        };
+        break;
       default:
         return;
     }
