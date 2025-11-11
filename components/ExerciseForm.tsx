@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import type { Exercise, MatchingPair, JuzAmmaVerse, SequenceStep, CodeBlock, ColorCodingExerciseType, BlockCodingCommand } from '../types';
+import type { Exercise, MatchingPair, JuzAmmaVerse, SequenceStep, IfThenRule, ColorCodingExerciseType } from '../types';
 import { ExerciseType, coloringPages, mazes, juzAmmaData } from '../types';
 import { TrashIcon, PlusIcon } from './Icons';
 
@@ -444,79 +444,85 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, onU
           </>
         );
 
-      case ExerciseType.BLOCK_CODING:
-        const blockCommands: { command: BlockCodingCommand; emoji: string; label: string }[] = [
-          { command: 'move_forward', emoji: '⬆️', label: 'Maju' },
-          { command: 'turn_left', emoji: '⬅️', label: 'Belok Kiri' },
-          { command: 'turn_right', emoji: '➡️', label: 'Belok Kanan' },
-          { command: 'jump', emoji: '⬆️', label: 'Lompat' },
-          { command: 'repeat', emoji: '🔄', label: 'Ulangi' }
-        ];
-
+      case ExerciseType.IF_THEN_LOGIC:
         return (
           <>
-            <InputField label="Instruksi" id={`block-instruction-${exercise.id}`}>
+            <InputField label="Instruksi" id={`ifThen-instruction-${exercise.id}`}>
               <TextInput
-                id={`block-instruction-${exercise.id}`}
+                id={`ifThen-instruction-${exercise.id}`}
                 value={exercise.config.instruction}
                 onChange={e => handleConfigChange('instruction', e.target.value)}
-                placeholder="Contoh: Susun blok untuk sampai ke tujuan"
+                placeholder="Contoh: Ikuti aturan di bawah untuk mewarnai kotak"
+              />
+            </InputField>
+
+            <InputField label="Jumlah Item" id={`ifThen-items-${exercise.id}`}>
+              <NumberInput
+                id={`ifThen-items-${exercise.id}`}
+                value={exercise.config.items}
+                onChange={e => handleConfigChange('items', parseInt(e.target.value))}
+                min={5}
+                max={20}
               />
             </InputField>
 
             <div>
-              <label className="block text-sm font-bold text-orange-700 mb-2">Blok Kode</label>
-              {exercise.config.blocks?.map((block: CodeBlock, idx: number) => (
-                <div key={block.id} className="flex gap-2 mb-2 items-center bg-blue-50 p-2 rounded-lg">
-                  <span className="text-orange-600 font-bold">{idx + 1}.</span>
-                  <span className="text-2xl">{block.emoji}</span>
-                  <span className="flex-1 font-medium">{block.label}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newBlocks = exercise.config.blocks.filter((_: CodeBlock, i: number) => i !== idx);
-                      handleConfigChange('blocks', newBlocks);
-                    }}
-                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg"
-                  >
-                    <TrashIcon />
-                  </button>
+              <label className="block text-sm font-bold text-orange-700 mb-2">Aturan Jika-Maka</label>
+              {exercise.config.rules?.map((rule: IfThenRule, idx: number) => (
+                <div key={rule.id} className="mb-3 p-3 bg-purple-50 rounded-lg border-2 border-purple-200">
+                  <div className="flex gap-2 mb-2 items-center">
+                    <span className="text-purple-600 font-bold">Aturan {idx + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newRules = exercise.config.rules.filter((_: IfThenRule, i: number) => i !== idx);
+                        handleConfigChange('rules', newRules);
+                      }}
+                      className="ml-auto p-2 text-red-600 hover:bg-red-100 rounded-lg"
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    <TextInput
+                      value={rule.condition}
+                      onChange={e => {
+                        const newRules = [...exercise.config.rules];
+                        newRules[idx] = { ...rule, condition: e.target.value };
+                        handleConfigChange('rules', newRules);
+                      }}
+                      placeholder="Contoh: Jika angka genap"
+                      className="w-full"
+                    />
+                    <TextInput
+                      value={rule.action}
+                      onChange={e => {
+                        const newRules = [...exercise.config.rules];
+                        newRules[idx] = { ...rule, action: e.target.value };
+                        handleConfigChange('rules', newRules);
+                      }}
+                      placeholder="Contoh: Warnai biru 🔵"
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               ))}
 
-              <div className="mt-3">
-                <p className="text-sm font-medium text-slate-600 mb-2">Tambah Blok:</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {blockCommands.map(cmd => (
-                    <button
-                      key={cmd.command}
-                      type="button"
-                      onClick={() => {
-                        const newBlock: CodeBlock = {
-                          id: `block-${Date.now()}-${Math.random()}`,
-                          command: cmd.command,
-                          emoji: cmd.emoji,
-                          label: cmd.label
-                        };
-                        handleConfigChange('blocks', [...(exercise.config.blocks || []), newBlock]);
-                      }}
-                      className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
-                    >
-                      <span className="text-xl">{cmd.emoji}</span>
-                      <span className="text-sm">{cmd.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const newRule: IfThenRule = {
+                    id: `rule-${Date.now()}-${Math.random()}`,
+                    condition: 'Jika...',
+                    action: 'Maka...'
+                  };
+                  handleConfigChange('rules', [...(exercise.config.rules || []), newRule]);
+                }}
+                className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center justify-center gap-2"
+              >
+                <PlusIcon /> Tambah Aturan
+              </button>
             </div>
-
-            <InputField label="Ukuran Grid (opsional)" id={`block-grid-${exercise.id}`}>
-              <NumberInput
-                id={`block-grid-${exercise.id}`}
-                value={exercise.config.gridSize || 5}
-                onChange={e => handleConfigChange('gridSize', parseInt(e.target.value))}
-              />
-            </InputField>
           </>
         );
 
