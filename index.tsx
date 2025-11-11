@@ -1,8 +1,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { StackProvider, StackTheme } from '@stackframe/stack';
-import { stackApp } from './stack';
 import App from './App';
 
 const rootElement = document.getElementById('root');
@@ -13,8 +11,6 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <StackProvider app={stackApp}>
-      <App />
-    </StackProvider>
+    <App />
   </React.StrictMode>
 );

@@ -1,6 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { useUser, useStackApp } from '@stackframe/stack';
-import { LoginPage } from './components/LoginPage';
 import { ControlPanel } from './components/ControlPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { ExportOptionsModal } from './components/ExportOptionsModal';
@@ -163,15 +161,6 @@ const calculatePageHeight = (exercises: Exercise[]): number => {
 const MAX_PAGE_HEIGHT = 85; // Conservative estimate to ensure content fits
 
 const App: React.FC = () => {
-  // Authentication
-  const user = useUser();
-  const stackApp = useStackApp();
-
-  // If user is not logged in, show login page
-  if (!user) {
-    return <LoginPage />;
-  }
-
   const [worksheet, setWorksheet] = useState<Worksheet>(initialWorksheet);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -478,38 +467,15 @@ const App: React.FC = () => {
           <div className="absolute top-1/2 right-10 text-5xl animate-pulse delay-200">🌈</div>
         </div>
         <div className="container mx-auto relative z-10">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-6xl">📝</span>
-                <h1 className="text-4xl md:text-5xl font-bold text-white font-comic drop-shadow-lg">
-                  Kids Worksheet Generator
-                </h1>
-              </div>
-              <p className="text-white text-lg md:text-xl font-medium ml-20 drop-shadow">
-                Buat lembar kerja yang menyenangkan untuk anak-anak dengan mudah! 🚀
-              </p>
-            </div>
-
-            {/* User Info & Logout */}
-            <div className="flex items-center gap-4 bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-3 mt-2">
-              <div className="text-right">
-                <div className="text-white font-semibold text-sm">
-                  {user.displayName || user.primaryEmail || 'User'}
-                </div>
-                {user.primaryEmail && user.displayName && (
-                  <div className="text-white/80 text-xs">{user.primaryEmail}</div>
-                )}
-              </div>
-              <button
-                onClick={() => stackApp.signOut()}
-                className="bg-white/30 hover:bg-white/40 text-white font-semibold px-4 py-2 rounded-xl transition-all transform hover:scale-105 text-sm backdrop-blur-sm"
-                title="Keluar"
-              >
-                Keluar
-              </button>
-            </div>
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-6xl">📝</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-white font-comic drop-shadow-lg">
+              Kids Worksheet Generator
+            </h1>
           </div>
+          <p className="text-white text-lg md:text-xl font-medium ml-20 drop-shadow">
+            Buat lembar kerja yang menyenangkan untuk anak-anak dengan mudah! 🚀
+          </p>
         </div>
       </header>
       <main className="container mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
