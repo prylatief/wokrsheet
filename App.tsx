@@ -3,6 +3,10 @@ import { ControlPanel } from './components/ControlPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { ExportOptionsModal } from './components/ExportOptionsModal';
 import { DownloadProgressModal } from './components/DownloadProgressModal';
+import { LoginPage } from './components/LoginPage';
+import { RegisterPage } from './components/RegisterPage';
+import { UserProfile } from './components/UserProfile';
+import { AuthProvider, useAuth } from './lib/AuthContext';
 import type { Worksheet, Exercise, Theme, BorderTheme, SchoolInfo } from './types';
 import { ExerciseType, coloringPages, mazes, juzAmmaData } from './types';
 
@@ -160,7 +164,8 @@ const calculatePageHeight = (exercises: Exercise[]): number => {
 // Maximum height that fits comfortably on an A4 page
 const MAX_PAGE_HEIGHT = 85; // Conservative estimate to ensure content fits
 
-const App: React.FC = () => {
+// Main App Component with Auth Logic
+const MainApp: React.FC = () => {
   const [worksheet, setWorksheet] = useState<Worksheet>(initialWorksheet);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -527,15 +532,20 @@ const App: React.FC = () => {
           <div className="absolute top-1/2 right-10 text-5xl animate-pulse delay-200">🌈</div>
         </div>
         <div className="container mx-auto relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-6xl">📝</span>
-            <h1 className="text-4xl md:text-5xl font-bold text-white font-comic drop-shadow-lg">
-              Kids Worksheet Generator
-            </h1>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-6xl">📝</span>
+                <h1 className="text-4xl md:text-5xl font-bold text-white font-comic drop-shadow-lg">
+                  Kids Worksheet Generator
+                </h1>
+              </div>
+              <p className="text-white text-lg md:text-xl font-medium ml-20 drop-shadow">
+                Buat lembar kerja yang menyenangkan untuk anak-anak dengan mudah! 🚀
+              </p>
+            </div>
+            <UserProfile />
           </div>
-          <p className="text-white text-lg md:text-xl font-medium ml-20 drop-shadow">
-            Buat lembar kerja yang menyenangkan untuk anak-anak dengan mudah! 🚀
-          </p>
         </div>
       </header>
       <main className="container mx-auto p-4 md:p-8">
@@ -581,6 +591,44 @@ const App: React.FC = () => {
       />
     </div>
   );
+};
+
+// App wrapper with authentication logic
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+};
+
+// Component that handles routing based on auth state
+const AppContent: React.FC = () => {
+  const { user, loading } = useAuth();
+  const [showRegister, setShowRegister] = useState(false);
+
+  // Show loading state while checking session
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mb-4"></div>
+          <p className="text-xl text-gray-600 font-medium">Memuat...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is not logged in, show login or register page
+  if (!user) {
+    if (showRegister) {
+      return <RegisterPage onSwitchToLogin={() => setShowRegister(false)} />;
+    }
+    return <LoginPage onSwitchToRegister={() => setShowRegister(true)} />;
+  }
+
+  // If user is logged in, show the main application
+  return <MainApp />;
 };
 
 export default App;
