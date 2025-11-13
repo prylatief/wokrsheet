@@ -235,7 +235,12 @@ const MainApp: React.FC = () => {
             title: 'Latihan Juz Amma',
             exerciseType: 'fill_blank',
             surah: firstSurah.name,
-            verses: [firstSurah.verses[0]],
+            verses: [{
+              surah: firstSurah.name,
+              verseNumber: firstSurah.verses[0].number,
+              arabic: firstSurah.verses[0].arabic,
+              translation: firstSurah.verses[0].translation
+            }],
             blankWord: undefined
           },
           pageNumber: currentPage
