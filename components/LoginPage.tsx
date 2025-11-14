@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../lib/AuthContext';
+import DemoAccountSetup from './DemoAccountSetup';
 
 interface LoginPageProps {
   onSwitchToRegister: () => void;
@@ -37,6 +38,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
       return 'Koneksi gagal. Periksa internet Anda.';
     }
     return 'Terjadi kesalahan. Silakan coba lagi.';
+  };
+
+  const handleDemoLogin = () => {
+    setEmail('latief@email.com');
+    setPassword('zxcvbnm');
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,6 +162,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
                 </>
               )}
             </button>
+
+            {/* Demo Login Button */}
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className="w-full flex items-center justify-center px-5 py-3 border-2 border-blue-400 text-base font-bold rounded-xl text-blue-600 bg-blue-50 hover:bg-blue-100 hover:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              <span className="mr-2">🎯</span>
+              Isi Kredensial Demo
+            </button>
           </form>
 
           {/* Register Link */}
@@ -179,6 +197,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
           </p>
         </div>
       </div>
+
+      {/* Demo Account Setup */}
+      <DemoAccountSetup />
     </div>
   );
 };
