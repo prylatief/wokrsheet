@@ -539,13 +539,13 @@ const MainApp: React.FC = () => {
         <div className="container mx-auto relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-6xl">📝</span>
-                <h1 className="text-4xl md:text-5xl font-bold text-white font-comic drop-shadow-lg">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                <span className="text-4xl sm:text-5xl md:text-6xl">📝</span>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white font-comic drop-shadow-lg">
                   Kids Worksheet Generator
                 </h1>
               </div>
-              <p className="text-white text-lg md:text-xl font-medium ml-20 drop-shadow">
+              <p className="text-white text-sm sm:text-base md:text-lg lg:text-xl font-medium ml-12 sm:ml-16 md:ml-20 drop-shadow">
                 Buat lembar kerja yang menyenangkan untuk anak-anak dengan mudah! 🚀
               </p>
             </div>
@@ -553,8 +553,8 @@ const MainApp: React.FC = () => {
           </div>
         </div>
       </header>
-      <main className="container mx-auto p-4 md:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="container mx-auto p-2 sm:p-4 md:p-6 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-6 lg:gap-8">
         <div className="lg:col-span-1 no-print">
           <ControlPanel
             worksheet={worksheet}

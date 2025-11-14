@@ -68,7 +68,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-purple-50 p-6 rounded-2xl shadow-2xl border-4 border-purple-200 space-y-8 sticky top-8">
+    <div className="bg-gradient-to-br from-white to-purple-50 p-6 rounded-2xl shadow-2xl border-4 border-purple-200 space-y-8 md:sticky md:top-8">
       <div>
         <div className="flex items-center gap-2 mb-4">
           <span className="text-3xl">⚙️</span>
@@ -92,7 +92,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <label className="block text-sm font-bold text-purple-700 mb-2 flex items-center gap-1">
               <span>🎨</span> Tema Latar
             </label>
-            <div className="mt-2 grid grid-cols-2 gap-3">
+            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {themes.map(theme => (
                     <button
                         key={theme.id}
@@ -117,7 +117,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           <label className="block text-sm font-bold text-purple-700 mb-2 flex items-center gap-1">
             <span>✨</span> Pilih Bingkai
           </label>
-          <div className="mt-2 grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 bg-purple-50 rounded-lg">
+          <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 bg-purple-50 rounded-lg">
             {borderThemes.map(border => (
               <button
                 key={border.id}
