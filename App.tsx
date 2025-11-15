@@ -3,10 +3,6 @@ import { ControlPanel } from './components/ControlPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { ExportOptionsModal } from './components/ExportOptionsModal';
 import { DownloadProgressModal } from './components/DownloadProgressModal';
-import { LoginPage } from './components/LoginPage';
-import { RegisterPage } from './components/RegisterPage';
-import { UserProfile } from './components/UserProfile';
-import { AuthProvider, useAuth } from './lib/AuthContext';
 import type { Worksheet, Exercise, Theme, BorderTheme, SchoolInfo } from './types';
 import { ExerciseType, coloringPages, mazes, juzAmmaData } from './types';
 
@@ -549,7 +545,6 @@ const MainApp: React.FC = () => {
                 Buat lembar kerja yang menyenangkan untuk anak-anak dengan mudah! 🚀
               </p>
             </div>
-            <UserProfile />
           </div>
         </div>
       </header>
@@ -598,41 +593,8 @@ const MainApp: React.FC = () => {
   );
 };
 
-// App wrapper with authentication logic
+// App component - directly shows the worksheet generator
 const App: React.FC = () => {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
-};
-
-// Component that handles routing based on auth state
-const AppContent: React.FC = () => {
-  const { user, loading } = useAuth();
-  const [showRegister, setShowRegister] = useState(false);
-
-  // Show loading state while checking session
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mb-4"></div>
-          <p className="text-xl text-gray-600 font-medium">Memuat...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // If user is not logged in, show login or register page
-  if (!user) {
-    if (showRegister) {
-      return <RegisterPage onSwitchToLogin={() => setShowRegister(false)} />;
-    }
-    return <LoginPage onSwitchToRegister={() => setShowRegister(true)} />;
-  }
-
-  // If user is logged in, show the main application
   return <MainApp />;
 };
 
