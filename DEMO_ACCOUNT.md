@@ -1,5 +1,37 @@
 # Demo Account Setup
 
+## ⚠️ PENTING: Setup Awal
+
+**SEBELUM menjalankan aplikasi, Anda HARUS membuat file `.env` terlebih dahulu!**
+
+### Langkah Setup:
+
+1. **Copy file `.env.example` menjadi `.env`**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Verifikasi isi file `.env`**
+   ```bash
+   cat .env
+   ```
+
+   Pastikan berisi:
+   ```
+   VITE_SUPABASE_URL=https://hjftvsozcjdlilsruccj.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   ```
+
+3. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+4. **Jalankan aplikasi**
+   ```bash
+   npm run dev
+   ```
+
 ## Kredensial Akun Demo
 
 **Email:** `latief@email.com`
@@ -36,6 +68,29 @@
 
 ## Troubleshooting
 
+### ❌ Login Tidak Berfungsi / Akun Demo Tidak Bisa Dibuat
+
+**Masalah Paling Umum:** File `.env` tidak ada!
+
+**Solusi:**
+```bash
+# 1. Cek apakah file .env ada
+ls -la | grep .env
+
+# 2. Jika tidak ada, copy dari .env.example
+cp .env.example .env
+
+# 3. Restart development server
+# Tekan Ctrl+C untuk stop, lalu:
+npm run dev
+```
+
+**Cara Mengecek di Browser:**
+1. Buka Developer Console (F12 atau Ctrl+Shift+I)
+2. Lihat tab Console
+3. Jika ada warning: `"Missing Supabase environment variables"` → berarti file `.env` tidak ada atau tidak ter-load
+4. Ikuti solusi di atas, lalu refresh browser
+
 ### Akun Sudah Ada
 Jika Anda melihat pesan "Akun demo sudah ada!", ini berarti akun telah berhasil dibuat sebelumnya. Anda dapat langsung login menggunakan kredensial di atas.
 
@@ -43,6 +98,20 @@ Jika Anda melihat pesan "Akun demo sudah ada!", ini berarti akun telah berhasil 
 Tergantung pada pengaturan Supabase Anda:
 - Jika **email confirmation dinonaktifkan**: Anda dapat langsung login setelah akun dibuat
 - Jika **email confirmation diaktifkan**: Anda perlu mengkonfirmasi email terlebih dahulu, atau nonaktifkan email confirmation di Supabase dashboard
+
+### Error: "Email atau password salah"
+Jika mendapat error ini saat login:
+1. Pastikan akun sudah dibuat terlebih dahulu menggunakan panel "Demo Account Setup"
+2. Pastikan kredensial yang dimasukkan benar:
+   - Email: `latief@email.com`
+   - Password: `zxcvbnm`
+3. Cek browser console untuk error detail
+
+### Network Error
+Jika mendapat error koneksi:
+1. Pastikan Anda terhubung ke internet
+2. Pastikan Supabase project masih aktif
+3. Cek URL Supabase di file `.env` masih valid
 
 ### Menonaktifkan Email Confirmation di Supabase
 
