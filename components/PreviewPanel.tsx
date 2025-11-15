@@ -690,14 +690,12 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
           </div>
         )}
 
-        <header className="flex justify-between border-b-2 border-purple-300 pb-3 mb-5 print:pb-2 print:mb-4" style={{ alignItems: 'center' }}>
-          <div className="text-base font-bold print:text-sm flex gap-2" style={{ alignItems: 'center' }}>
-            <span className="leading-none">Nama:</span>
-            <span className="answer-line border-purple-400 w-40 print:w-32"></span>
+        <header className="flex justify-between items-center border-b-2 border-purple-300 pb-3 mb-5 print:pb-2 print:mb-4">
+          <div className="text-base font-bold print:text-sm">
+            Nama: <span className="inline-block answer-line border-purple-400 w-40 ml-2 print:w-32"></span>
           </div>
-          <div className="text-base font-bold print:text-sm flex gap-2" style={{ alignItems: 'center' }}>
-            <span className="leading-none">Kelas:</span>
-            <span className="answer-line border-purple-400 w-20 print:w-16"></span>
+          <div className="text-base font-bold print:text-sm">
+            Kelas: <span className="inline-block answer-line border-purple-400 w-20 ml-2 print:w-16"></span>
           </div>
         </header>
 
