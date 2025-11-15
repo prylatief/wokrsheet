@@ -11,6 +11,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Email validation
@@ -44,11 +45,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
     setEmail('latief@email.com');
     setPassword('zxcvbnm');
     setError('');
+    setSuccess('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     // Client-side validation
     if (!email.trim()) {
@@ -75,7 +78,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
 
     try {
       await signIn(email, password);
-      // Success - AuthContext will handle the state update
+      // Success - Show success message
+      setSuccess('✓ Login berhasil! Selamat datang...');
+      // AuthContext will handle the state update and redirect automatically
     } catch (err: any) {
       setError(handleAuthError(err));
     } finally {
@@ -141,6 +146,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
               <div className="bg-red-50 border-2 border-red-300 rounded-lg p-3 flex items-start gap-2">
                 <span className="text-xl">⚠️</span>
                 <p className="text-red-700 text-sm font-medium flex-1">{error}</p>
+              </div>
+            )}
+
+            {/* Success Message */}
+            {success && (
+              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3 flex items-start gap-2 animate-pulse">
+                <span className="text-xl">✅</span>
+                <p className="text-green-700 text-sm font-medium flex-1">{success}</p>
               </div>
             )}
 

@@ -16,11 +16,11 @@ const DemoAccountSetup: React.FC = () => {
     try {
       await signUp(demoEmail, demoPassword);
       setStatus('success');
-      setMessage('✓ Akun demo berhasil dibuat!\n\nEmail: latief@email.com\nPassword: zxcvbnm\n\nSilakan login menggunakan kredensial di atas.');
+      setMessage('✅ BERHASIL! Akun demo berhasil dibuat!\n\n📧 Email: latief@email.com\n🔑 Password: zxcvbnm\n\n✓ Silakan login menggunakan kredensial di atas atau klik tombol "Isi Kredensial Demo".');
     } catch (error: any) {
       if (error.message?.includes('already registered') || error.message?.includes('sudah terdaftar')) {
         setStatus('success');
-        setMessage('✓ Akun demo sudah ada!\n\nEmail: latief@email.com\nPassword: zxcvbnm\n\nAnda dapat login menggunakan kredensial di atas.');
+        setMessage('✅ BERHASIL! Akun demo sudah ada!\n\n📧 Email: latief@email.com\n🔑 Password: zxcvbnm\n\n✓ Anda dapat langsung login menggunakan kredensial di atas atau klik tombol "Isi Kredensial Demo".');
       } else {
         setStatus('error');
         setMessage(`Error: ${error.message}`);
