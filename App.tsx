@@ -14,6 +14,153 @@ declare global {
   }
 }
 
+// Browser compatibility and library availability checks
+const checkBrowserCompatibility = (): { isCompatible: boolean; issues: string[] } => {
+  const issues: string[] = [];
+  
+  // Check if required libraries are loaded
+  if (typeof window.html2canvas === 'undefined') {
+    issues.push('html2canvas library tidak tersedia. Pastikan koneksi internet stabil.');
+  }
+  
+  if (typeof window.jspdf === 'undefined') {
+    issues.push('jsPDF library tidak tersedia. Pastikan koneksi internet stabil.');
+  }
+  
+  // Check browser support for required features
+  if (!document.fonts) {
+    issues.push('Browser tidak mendukung Font Loading API. Hasil PDF mungkin tidak optimal.');
+  }
+  
+  if (!window.crypto || !window.crypto.randomUUID) {
+    issues.push('Browser tidak mendukung Crypto API. Beberapa fitur mungkin tidak berfungsi.');
+  }
+  
+  // Check Canvas support
+  const canvas = document.createElement('canvas');
+  if (!canvas.getContext || !canvas.getContext('2d')) {
+    issues.push('Browser tidak mendukung HTML5 Canvas. PDF tidak dapat dibuat.');
+  }
+  
+  // Check for modern browser features
+  if (!window.Promise) {
+    issues.push('Browser tidak mendukung Promises. Silakan gunakan browser yang lebih baru.');
+  }
+  
+  // Check user agent for known problematic browsers
+  const userAgent = navigator.userAgent.toLowerCase();
+  if (userAgent.includes('internet explorer')) {
+    issues.push('Internet Explorer tidak didukung. Silakan gunakan Chrome, Firefox, atau Edge.');
+  }
+  
+  return {
+    isCompatible: issues.length === 0,
+    issues
+  };
+};
+
+// Enhanced content validation with detailed error reporting
+const validateContentForA4 = (content: HTMLElement): { isValid: boolean; errors: string[]; warnings: string[] } => {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  
+  if (!content) {
+    errors.push('Konten tidak ditemukan untuk validasi.');
+    return { isValid: false, errors, warnings };
+  }
+  
+  const rect = content.getBoundingClientRect();
+  
+  // Convert pixels to mm (assuming 96 DPI standard)
+  const pixelsToMm = (pixels: number) => (pixels * 25.4) / 96;
+  
+  const contentWidthMm = pixelsToMm(rect.width);
+  const contentHeightMm = pixelsToMm(rect.height);
+  
+  // A4 dimensions and print safe area
+  const A4_WIDTH_MM = 210;
+  const A4_HEIGHT_MM = 297;
+  const PRINT_SAFE_WIDTH_MM = 180; // 210mm - 30mm margins
+  const PRINT_SAFE_HEIGHT_MM = 257; // 297mm - 40mm margins
+  
+  // Check if content exceeds A4 dimensions
+  if (contentWidthMm > A4_WIDTH_MM) {
+    errors.push(`Lebar konten (${contentWidthMm.toFixed(1)}mm) melebihi lebar kertas A4 (${A4_WIDTH_MM}mm).`);
+  }
+  
+  if (contentHeightMm > A4_HEIGHT_MM) {
+    errors.push(`Tinggi konten (${contentHeightMm.toFixed(1)}mm) melebihi tinggi kertas A4 (${A4_HEIGHT_MM}mm).`);
+  }
+  
+  // Check if content exceeds print safe area
+  if (contentWidthMm > PRINT_SAFE_WIDTH_MM) {
+    if (contentWidthMm <= A4_WIDTH_MM) {
+      warnings.push(`Lebar konten (${contentWidthMm.toFixed(1)}mm) mendekati batas kertas. Sebagian konten mungkin terpotong saat dicetak.`);
+    }
+  }
+  
+  if (contentHeightMm > PRINT_SAFE_HEIGHT_MM) {
+    if (contentHeightMm <= A4_HEIGHT_MM) {
+      warnings.push(`Tinggi konten (${contentHeightMm.toFixed(1)}mm) mendekati batas kertas. Sebagian konten mungkin terpotong saat dicetak.`);
+    }
+  }
+  
+  // Check for very small content that might indicate rendering issues
+  if (contentWidthMm < 50 || contentHeightMm < 50) {
+    warnings.push('Konten tampak sangat kecil. Pastikan halaman sudah dimuat dengan benar.');
+  }
+  
+  // Check for extremely large content that might cause memory issues
+  const totalPixels = rect.width * rect.height;
+  if (totalPixels > 10000000) { // 10 million pixels
+    warnings.push('Konten sangat besar dan mungkin menyebabkan masalah performa saat membuat PDF.');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
+  };
+};
+
+// Enhanced error handling with user-friendly messages
+const handlePdfGenerationError = (error: any): string => {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  const errorLower = errorMessage.toLowerCase();
+  
+  // Categorize errors and provide specific solutions
+  if (errorLower.includes('network') || errorLower.includes('fetch') || errorLower.includes('load')) {
+    return 'Gagal memuat library yang diperlukan. Periksa koneksi internet Anda dan coba lagi.';
+  }
+  
+  if (errorLower.includes('memory') || errorLower.includes('out of memory')) {
+    return 'Konten terlalu besar untuk diproses. Coba kurangi jumlah latihan per halaman atau tutup tab browser lain.';
+  }
+  
+  if (errorLower.includes('canvas') || errorLower.includes('html2canvas')) {
+    return 'Gagal menangkap tampilan halaman. Coba refresh halaman dan pastikan semua konten sudah dimuat dengan benar.';
+  }
+  
+  if (errorLower.includes('pdf') || errorLower.includes('jspdf')) {
+    return 'Gagal membuat file PDF. Pastikan browser Anda mendukung fitur ini dan coba lagi.';
+  }
+  
+  if (errorLower.includes('print safe area') || errorLower.includes('too large')) {
+    return 'Konten terlalu besar untuk kertas A4. Kurangi jumlah latihan per halaman atau perkecil ukuran konten.';
+  }
+  
+  if (errorLower.includes('font') || errorLower.includes('text')) {
+    return 'Masalah dengan rendering teks. Tunggu sebentar agar font dimuat dengan benar, lalu coba lagi.';
+  }
+  
+  if (errorLower.includes('timeout')) {
+    return 'Proses pembuatan PDF memakan waktu terlalu lama. Coba kurangi kompleksitas konten atau refresh halaman.';
+  }
+  
+  // Generic fallback message
+  return 'Terjadi kesalahan saat membuat PDF. Silakan coba lagi. Jika masalah berlanjut, coba kurangi jumlah latihan per halaman atau refresh halaman.';
+};
+
 const initialWorksheet: Worksheet = {
   title: 'Latihan Seru Hari Ini!',
   theme: 'default',
@@ -79,69 +226,111 @@ const initialWorksheet: Worksheet = {
   ]
 };
 
-// Utility function to estimate exercise height in relative units
-// These are approximate values based on typical rendering
+// A4 dimensions and conversion constants for mm-based calculations
+const A4_PRINT_SAFE_HEIGHT_MM = 257; // 297mm - 20mm top - 20mm bottom
+const A4_PRINT_SAFE_HEIGHT_UNITS = 100; // Normalized units for calculation
+const MM_TO_UNITS = A4_PRINT_SAFE_HEIGHT_UNITS / A4_PRINT_SAFE_HEIGHT_MM;
+
+// Utility function to estimate exercise height using mm-based calculations
+// Heights are calculated in mm and converted to relative units for consistency
 const estimateExerciseHeight = (exercise: Exercise): number => {
-  const baseHeight = 8; // Base padding and margins for each exercise card
+  const baseHeightMm = 15; // Base padding and margins for each exercise card in mm
+  const baseHeight = baseHeightMm * MM_TO_UNITS;
 
   switch (exercise.type) {
     case ExerciseType.COUNTING:
       // Title + emojis + answer line
-      return baseHeight + 6 + Math.ceil(exercise.config.count / 5) * 3;
+      const countingContentMm = 12 + Math.ceil(exercise.config.count / 5) * 8; // 12mm title + 8mm per row
+      return baseHeight + (countingContentMm * MM_TO_UNITS);
 
     case ExerciseType.ADDITION:
     case ExerciseType.SUBTRACTION:
       // Title + equation + optional helpers
-      const helpersHeight = exercise.config.showHelpers ? 4 : 0;
-      return baseHeight + 6 + helpersHeight;
+      const equationContentMm = 12; // 12mm for title and equation
+      const helpersHeightMm = exercise.config.showHelpers ? 10 : 0; // 10mm for helpers
+      return baseHeight + ((equationContentMm + helpersHeightMm) * MM_TO_UNITS);
 
     case ExerciseType.TRACING:
       // Title + large text
-      return baseHeight + 8;
+      const tracingContentMm = 20; // 20mm for title and large text
+      return baseHeight + (tracingContentMm * MM_TO_UNITS);
 
     case ExerciseType.DRAWING:
       // Title + instruction + drawing area
-      return baseHeight + 18;
+      const drawingContentMm = 45; // 45mm for title, instruction and drawing area
+      return baseHeight + (drawingContentMm * MM_TO_UNITS);
 
     case ExerciseType.PATTERN:
       // Title + pattern items
-      return baseHeight + 8;
+      const patternContentMm = 20; // 20mm for title and pattern items
+      return baseHeight + (patternContentMm * MM_TO_UNITS);
 
     case ExerciseType.MATCHING:
       // Title + matching pairs (depends on number of pairs)
       const pairCount = exercise.config.pairs.length;
-      return baseHeight + 6 + (pairCount * 2);
+      const matchingContentMm = 12 + (pairCount * 5); // 12mm title + 5mm per pair
+      return baseHeight + (matchingContentMm * MM_TO_UNITS);
 
     case ExerciseType.SPELLING:
       // Title + emoji + letter boxes
-      return baseHeight + 10;
+      const spellingContentMm = 25; // 25mm for title, emoji and letter boxes
+      return baseHeight + (spellingContentMm * MM_TO_UNITS);
 
     case ExerciseType.COLORING:
       // Title + instruction + SVG
-      return baseHeight + 22;
+      const coloringContentMm = 55; // 55mm for title, instruction and SVG
+      return baseHeight + (coloringContentMm * MM_TO_UNITS);
 
     case ExerciseType.MAZE:
       // Title + instruction + SVG
-      return baseHeight + 22;
+      const mazeContentMm = 55; // 55mm for title, instruction and SVG
+      return baseHeight + (mazeContentMm * MM_TO_UNITS);
 
     case ExerciseType.JUZ_AMMA:
       // Title + verses (depends on exercise type and verse count)
       const verseCount = exercise.config.verses?.length || 1;
       const { exerciseType: juzExType } = exercise.config;
+      let juzContentMm = 12; // Base 12mm for title
+      
       if (juzExType === 'matching') {
-        return baseHeight + 8 + (verseCount * 5);
+        juzContentMm += verseCount * 12; // 12mm per verse for matching
+      } else if (juzExType === 'tracing') {
+        juzContentMm += verseCount * 15; // 15mm per verse for tracing
+      } else if (juzExType === 'complete_verse') {
+        juzContentMm += verseCount * 20; // 20mm per verse for complete verse
+      } else {
+        // fill_blank
+        juzContentMm += verseCount * 10; // 10mm per verse for fill blank
       }
-      if (juzExType === 'tracing') {
-        return baseHeight + 10 + (verseCount * 6);
-      }
-      if (juzExType === 'complete_verse') {
-        return baseHeight + 8 + (verseCount * 8);
-      }
-      // fill_blank
-      return baseHeight + 8 + (verseCount * 4);
+      return baseHeight + (juzContentMm * MM_TO_UNITS);
+
+    case ExerciseType.COLOR_CODING:
+      // Title + color sequence/matching/pattern
+      const colorCodingContentMm = 30; // 30mm for title and color elements
+      return baseHeight + (colorCodingContentMm * MM_TO_UNITS);
+
+    case ExerciseType.SEQUENCE_CODING:
+      // Title + sequence steps
+      const stepCount = exercise.config.steps?.length || 3;
+      const sequenceContentMm = 12 + (stepCount * 8); // 12mm title + 8mm per step
+      return baseHeight + (sequenceContentMm * MM_TO_UNITS);
+
+    case ExerciseType.IF_THEN_LOGIC:
+      // Title + rules + items grid
+      const ruleCount = exercise.config.rules?.length || 2;
+      const itemCount = exercise.config.items || 10;
+      const logicContentMm = 12 + (ruleCount * 6) + Math.ceil(itemCount / 5) * 8; // 12mm title + 6mm per rule + 8mm per row of items
+      return baseHeight + (logicContentMm * MM_TO_UNITS);
+
+    case ExerciseType.PIXEL_ART:
+      // Title + grid (depends on grid size)
+      const gridSize = Math.max(exercise.config.gridRows || 8, exercise.config.gridCols || 8);
+      const pixelContentMm = 12 + Math.min(gridSize * 3, 50); // 12mm title + 3mm per grid unit, max 50mm
+      return baseHeight + (pixelContentMm * MM_TO_UNITS);
 
     default:
-      return baseHeight + 10;
+      const defaultContentMm = 25; // 25mm default content height
+      return baseHeight + (defaultContentMm * MM_TO_UNITS);
   }
 };
 
@@ -157,8 +346,8 @@ const calculatePageHeight = (exercises: Exercise[]): number => {
   return headerHeight + exercisesHeight;
 };
 
-// Maximum height that fits comfortably on an A4 page
-const MAX_PAGE_HEIGHT = 85; // Conservative estimate to ensure content fits
+// Maximum height that fits comfortably on an A4 page based on print safe area
+const MAX_PAGE_HEIGHT = A4_PRINT_SAFE_HEIGHT_UNITS; // Based on A4 print safe height (257mm)
 
 // Main App Component with Auth Logic
 const MainApp: React.FC = () => {
@@ -167,6 +356,34 @@ const MainApp: React.FC = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const [libraryLoadError, setLibraryLoadError] = useState<string | null>(null);
+
+  // Check library availability on component mount
+  React.useEffect(() => {
+    const checkLibraries = () => {
+      const compatibility = checkBrowserCompatibility();
+      if (!compatibility.isCompatible) {
+        const criticalIssues = compatibility.issues.filter(issue => 
+          issue.includes('html2canvas') || 
+          issue.includes('jsPDF') || 
+          issue.includes('Canvas') ||
+          issue.includes('Internet Explorer')
+        );
+        
+        if (criticalIssues.length > 0) {
+          setLibraryLoadError(criticalIssues.join(' '));
+        }
+      }
+    };
+
+    // Check immediately
+    checkLibraries();
+    
+    // Also check after a delay to ensure libraries have time to load
+    const timeoutId = setTimeout(checkLibraries, 2000);
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const updateTitle = useCallback((newTitle: string) => {
     setWorksheet(prev => ({ ...prev, title: newTitle }));
@@ -359,6 +576,21 @@ const MainApp: React.FC = () => {
     setIsExportModalOpen(true);
   };
 
+  // Legacy function for backward compatibility - now uses enhanced validation
+  const validatePrintSafeArea = (content: HTMLElement): boolean => {
+    const validation = validateContentForA4(content);
+    
+    if (!validation.isValid) {
+      console.warn('Content validation failed:', validation.errors);
+    }
+    
+    if (validation.warnings.length > 0) {
+      console.warn('Content validation warnings:', validation.warnings);
+    }
+    
+    return validation.isValid;
+  };
+
   // Helper function to ensure all fonts are loaded
   const waitForFonts = async (): Promise<void> => {
     // Wait for document fonts to be ready
@@ -384,16 +616,46 @@ const MainApp: React.FC = () => {
     setIsDownloading(true);
     setDownloadProgress(0);
 
-    const printableArea = document.getElementById('printable-area');
-    if (!printableArea) {
-      console.error('Printable area not found!');
-      setIsDownloading(false);
-      return;
-    }
-
     try {
+      // Step 1: Check browser compatibility
+      const compatibility = checkBrowserCompatibility();
+      if (!compatibility.isCompatible) {
+        setIsDownloading(false);
+        const issuesList = compatibility.issues.join('\n• ');
+        alert(`Browser tidak kompatibel untuk membuat PDF:\n\n• ${issuesList}\n\nSilakan gunakan browser yang lebih baru seperti Chrome, Firefox, atau Edge.`);
+        return;
+      }
+
+      // Step 2: Find printable area
+      const printableArea = document.getElementById('printable-area');
+      if (!printableArea) {
+        setIsDownloading(false);
+        alert('Area konten tidak ditemukan. Silakan refresh halaman dan coba lagi.');
+        return;
+      }
+
       // Initial progress: 5%
       setDownloadProgress(5);
+
+      // Step 3: Comprehensive content validation
+      const contentValidation = validateContentForA4(printableArea);
+      
+      if (!contentValidation.isValid) {
+        setIsDownloading(false);
+        const errorsList = contentValidation.errors.join('\n• ');
+        alert(`Konten tidak sesuai untuk kertas A4:\n\n• ${errorsList}\n\nSilakan kurangi jumlah latihan per halaman atau perkecil ukuran konten.`);
+        return;
+      }
+
+      // Show warnings if any (but continue with generation)
+      if (contentValidation.warnings.length > 0) {
+        const warningsList = contentValidation.warnings.join('\n• ');
+        const proceed = confirm(`Peringatan:\n\n• ${warningsList}\n\nLanjutkan membuat PDF?`);
+        if (!proceed) {
+          setIsDownloading(false);
+          return;
+        }
+      }
 
       // Ensure all fonts (especially Arabic) are loaded
       await waitForFonts();
@@ -414,13 +676,18 @@ const MainApp: React.FC = () => {
 
       setDownloadProgress(15);
 
-      // Initialize PDF with A4 dimensions
-      const pdf = new window.jspdf.jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true,
-      });
+      // Step 4: Initialize PDF with A4 dimensions
+      let pdf;
+      try {
+        pdf = new window.jspdf.jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+          compress: true,
+        });
+      } catch (pdfError) {
+        throw new Error(`Gagal menginisialisasi PDF: ${pdfError instanceof Error ? pdfError.message : String(pdfError)}`);
+      }
 
       setDownloadProgress(20);
 
@@ -449,53 +716,90 @@ const MainApp: React.FC = () => {
         setDownloadProgress(Math.floor(20 + (i * progressPerPage * 0.3)));
 
         // Capture content at optimal resolution with improved settings for Arabic text
-        const canvas = await window.html2canvas(printableArea, {
-          scale: 2, // Reduced from 3 to 2 for more stable border rendering
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          letterRendering: false, // Disabled to prevent sub-pixel text shifts
-          logging: false,
-          imageTimeout: 0,
-          removeContainer: true,
-          windowWidth: printableArea.scrollWidth,
-          windowHeight: printableArea.scrollHeight,
-        });
+        let canvas;
+        try {
+          canvas = await Promise.race([
+            window.html2canvas(printableArea, {
+              scale: 2, // Reduced from 3 to 2 for more stable border rendering
+              useCORS: true,
+              allowTaint: true,
+              backgroundColor: '#ffffff',
+              letterRendering: false, // Disabled to prevent sub-pixel text shifts
+              logging: false,
+              imageTimeout: 15000, // 15 second timeout for images
+              removeContainer: true,
+              windowWidth: printableArea.scrollWidth,
+              windowHeight: printableArea.scrollHeight,
+            }),
+            // Timeout after 30 seconds
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('html2canvas timeout - halaman terlalu kompleks')), 30000)
+            )
+          ]);
+        } catch (canvasError) {
+          throw new Error(`Gagal menangkap tampilan halaman ${pageNum}: ${canvasError instanceof Error ? canvasError.message : String(canvasError)}`);
+        }
+
+        // Validate canvas result
+        if (!canvas || canvas.width === 0 || canvas.height === 0) {
+          throw new Error(`Canvas kosong untuk halaman ${pageNum}. Pastikan konten sudah dimuat dengan benar.`);
+        }
 
         // Update progress for canvas processing
         setDownloadProgress(Math.floor(20 + (i * progressPerPage * 0.6)));
 
-        const imgData = canvas.toDataURL('image/png', 1.0);
+        // Convert canvas to image data with error handling
+        let imgData;
+        try {
+          imgData = canvas.toDataURL('image/png', 1.0);
+          
+          // Validate image data
+          if (!imgData || imgData === 'data:,' || imgData.length < 100) {
+            throw new Error('Data gambar kosong atau tidak valid');
+          }
+        } catch (imageError) {
+          throw new Error(`Gagal mengkonversi halaman ${pageNum} ke gambar: ${imageError instanceof Error ? imageError.message : String(imageError)}`);
+        }
 
         // Add new page if not the first page
         if (i > 0) {
           pdf.addPage('a4', 'portrait');
         }
 
-        // Calculate dimensions to fit image properly on A4 page
+        // Calculate dimensions to fit image properly within A4 print safe area
         const imgWidth = canvas.width;
         const imgHeight = canvas.height;
         const ratio = imgWidth / imgHeight;
-        const pageRatio = pdfWidth / pdfHeight;
 
-        let finalWidth = pdfWidth;
-        let finalHeight = pdfHeight;
+        // A4 print safe area dimensions (excluding margins)
+        // 20mm top/bottom margins, 15mm left/right margins
+        const printSafeWidth = pdfWidth - 30; // 210mm - 15mm left - 15mm right = 180mm
+        const printSafeHeight = pdfHeight - 40; // 297mm - 20mm top - 20mm bottom = 257mm
+        const printSafeRatio = printSafeWidth / printSafeHeight;
 
-        // Fit to page while maintaining aspect ratio
-        if (ratio > pageRatio) {
-          // Image is wider than page
-          finalHeight = pdfWidth / ratio;
+        let finalWidth: number, finalHeight: number;
+
+        // Fit to print safe area while maintaining aspect ratio
+        if (ratio > printSafeRatio) {
+          // Image is wider - fit to safe width
+          finalWidth = printSafeWidth;
+          finalHeight = printSafeWidth / ratio;
         } else {
-          // Image is taller than page or same ratio
-          finalWidth = pdfHeight * ratio;
+          // Image is taller - fit to safe height
+          finalHeight = printSafeHeight;
+          finalWidth = printSafeHeight * ratio;
         }
 
-        // Center the image on the page - round to avoid sub-pixel rendering issues
-        const xOffset = Math.round((pdfWidth - finalWidth) / 2);
-        const yOffset = Math.round((pdfHeight - finalHeight) / 2);
+        // Position within print safe area (center content within safe margins)
+        const xOffset = 15 + Math.round((printSafeWidth - finalWidth) / 2); // 15mm left margin + centering
+        const yOffset = 20 + Math.round((printSafeHeight - finalHeight) / 2); // 20mm top margin + centering
 
-        // Add the image to PDF with higher quality
-        pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
+        // Add the image to PDF with higher quality and error handling
+        try {
+          pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
+        } catch (addImageError) {
+          throw new Error(`Gagal menambahkan halaman ${pageNum} ke PDF: ${addImageError instanceof Error ? addImageError.message : String(addImageError)}`);
+        }
 
         // Update progress after adding page
         setDownloadProgress(Math.floor(20 + ((i + 1) * progressPerPage)));
@@ -507,9 +811,13 @@ const MainApp: React.FC = () => {
       // Final processing
       setDownloadProgress(95);
 
-      // Generate filename
-      const fileName = `${worksheet.title.replace(/\s+/g, '_').toLowerCase() || 'worksheet'}.pdf`;
-      pdf.save(fileName);
+      // Step 5: Save PDF with error handling
+      try {
+        const fileName = `${worksheet.title.replace(/\s+/g, '_').toLowerCase() || 'worksheet'}.pdf`;
+        pdf.save(fileName);
+      } catch (saveError) {
+        throw new Error(`Gagal menyimpan file PDF: ${saveError instanceof Error ? saveError.message : String(saveError)}`);
+      }
 
       // Complete!
       setDownloadProgress(100);
@@ -518,7 +826,53 @@ const MainApp: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
       console.error("Error generating PDF:", error);
-      alert('Terjadi kesalahan saat membuat PDF. Silakan coba lagi.');
+      
+      // Use enhanced error handling
+      const userFriendlyMessage = handlePdfGenerationError(error);
+      
+      // Show detailed error message with fallback options
+      const errorDetails = error instanceof Error ? error.message : String(error);
+      const fullMessage = `${userFriendlyMessage}\n\nOpsi alternatif:\n• Coba refresh halaman dan ulangi\n• Kurangi jumlah latihan per halaman\n• Gunakan browser Chrome atau Firefox\n• Pastikan koneksi internet stabil\n• Gunakan opsi Print Manual (Ctrl+P)`;
+      
+      const useManualPrint = confirm(`${fullMessage}\n\nApakah Anda ingin mencoba print manual sebagai alternatif?`);
+      
+      if (useManualPrint) {
+        // Fallback to manual print
+        try {
+          // Show only the current page for printing
+          const originalPage = currentPage;
+          if (mode === 'current') {
+            setCurrentPage(currentPage);
+          } else if (mode === 'range' && startPage) {
+            setCurrentPage(startPage);
+          } else {
+            setCurrentPage(1);
+          }
+          
+          // Wait for page to render
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Trigger browser print dialog
+          window.print();
+          
+          // Restore original page
+          setCurrentPage(originalPage);
+        } catch (printError) {
+          alert('Gagal membuka dialog print. Silakan gunakan Ctrl+P secara manual.');
+        }
+      }
+      
+      // Log detailed error for debugging
+      console.error('Detailed PDF generation error:', {
+        error: errorDetails,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+        mode,
+        startPage,
+        endPage,
+        totalPages,
+        currentPage
+      });
     } finally {
       setIsDownloading(false);
       setDownloadProgress(0);
@@ -527,6 +881,25 @@ const MainApp: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 min-h-screen">
+      {/* Library Load Error Warning */}
+      {libraryLoadError && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 no-print">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium">
+                Peringatan: {libraryLoadError}
+              </p>
+              <p className="text-xs mt-1">
+                Fitur download PDF mungkin tidak berfungsi dengan baik. Silakan refresh halaman atau gunakan browser yang lebih baru.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <header className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 shadow-lg p-6 no-print relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-4 left-10 text-6xl animate-bounce">⭐</div>

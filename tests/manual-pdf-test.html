@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual PDF A4 Dimensions Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .test-pass {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .test-fail {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .test-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .dimensions-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .dimension-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .printable-area-demo {
+            width: 210mm;
+            height: 297mm;
+            border: 2px solid #007bff;
+            background: white;
+            margin: 20px auto;
+            padding: 20mm 15mm;
+            box-sizing: border-box;
+            position: relative;
+            transform: scale(0.3);
+            transform-origin: top center;
+        }
+        
+        .print-safe-area {
+            width: 100%;
+            height: 100%;
+            border: 2px dashed #28a745;
+            background: rgba(40, 167, 69, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .log-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .measurement-ruler {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 297mm;
+            border: 3px solid red;
+            background: rgba(255, 0, 0, 0.1);
+            z-index: 9999;
+            display: none;
+            pointer-events: none;
+        }
+        
+        .measurement-ruler::before {
+            content: "A4 Size Reference (210mm × 297mm)";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: red;
+            color: white;
+            padding: 5px 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>📏 Manual PDF A4 Dimensions Test</h1>
+    <p>This page helps you manually verify that PDF generation uses correct A4 dimensions and print safe areas.</p>
+    
+    <div class="test-container">
+        <h2>🎯 Test Controls</h2>
+        <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+        <button class="test-button" onclick="showA4Ruler()">Show A4 Size Ruler</button>
+        <button class="test-button" onclick="hideA4Ruler()">Hide A4 Size Ruler</button>
+        <button class="test-button" onclick="testBrowserCompatibility()">Test Browser Compatibility</button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div class="test-container">
+        <h2>📐 A4 Dimensions Reference</h2>
+        <div class="dimensions-display">
+            <div class="dimension-card">
+                <h4>A4 Paper Size</h4>
+                <p><strong>Width:</strong> 210mm (8.27")</p>
+                <p><strong>Height:</strong> 297mm (11.69")</p>
+                <p><strong>Pixels (96 DPI):</strong> 794 × 1123</p>
+            </div>
+            <div class="dimension-card">
+                <h4>Print Safe Area</h4>
+                <p><strong>Width:</strong> 180mm (210mm - 30mm margins)</p>
+                <p><strong>Height:</strong> 257mm (297mm - 40mm margins)</p>
+                <p><strong>Margins:</strong> 20mm top/bottom, 15mm left/right</p>
+            </div>
+            <div class="dimension-card">
+                <h4>Browser DPI</h4>
+                <p><strong>Standard DPI:</strong> 96</p>
+                <p><strong>Current Screen DPI:</strong> <span id="current-dpi">Calculating...</span></p>
+                <p><strong>Device Pixel Ratio:</strong> <span id="device-ratio">-</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>🖼️ Visual A4 Reference (30% Scale)</h2>
+        <div class="printable-area-demo">
+            <div class="print-safe-area">
+                Print Safe Area<br>
+                180mm × 257mm
+            </div>
+        </div>
+        <p style="text-align: center; color: #666;">
+            Blue border = A4 paper (210mm × 297mm)<br>
+            Green dashed area = Print safe area (180mm × 257mm)
+        </p>
+    </div>
+    
+    <div class="test-container">
+        <h2>📊 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📝 Test Log</h2>
+        <div id="log-output" class="log-output">Ready to run tests...\n</div>
+    </div>
+    
+    <!-- A4 Size Ruler Overlay -->
+    <div id="a4-ruler" class="measurement-ruler"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        // Test constants
+        const A4_WIDTH_MM = 210;
+        const A4_HEIGHT_MM = 297;
+        const PRINT_SAFE_WIDTH_MM = 180;
+        const PRINT_SAFE_HEIGHT_MM = 257;
+        const DPI_96 = 96;
+        
+        // Utility functions
+        const pixelsToMm = (pixels) => (pixels * 25.4) / DPI_96;
+        const mmToPixels = (mm) => (mm * DPI_96) / 25.4;
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logOutput = document.getElementById('log-output');
+            const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+            logOutput.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log-output').textContent = 'Log cleared...\n';
+        }
+        
+        // Display test result
+        function displayResult(testName, passed, message, isWarning = false) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'test-pass' : isWarning ? 'test-warning' : 'test-fail'}`;
+            resultDiv.innerHTML = `<strong>${testName}:</strong> ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        // Calculate current screen DPI
+        function calculateScreenDPI() {
+            const testDiv = document.createElement('div');
+            testDiv.style.width = '1in';
+            testDiv.style.height = '1in';
+            testDiv.style.position = 'absolute';
+            testDiv.style.left = '-100%';
+            testDiv.style.top = '-100%';
+            document.body.appendChild(testDiv);
+            
+            const dpi = testDiv.offsetWidth;
+            document.body.removeChild(testDiv);
+            
+            document.getElementById('current-dpi').textContent = dpi;
+            document.getElementById('device-ratio').textContent = window.devicePixelRatio || 1;
+            
+            return dpi;
+        }
+        
+        // Browser compatibility test
+        function testBrowserCompatibility() {
+            log('Testing browser compatibility...', 'info');
+            
+            const issues = [];
+            
+            if (typeof window.html2canvas === 'undefined') {
+                issues.push('html2canvas library tidak tersedia');
+            }
+            
+            if (typeof window.jspdf === 'undefined') {
+                issues.push('jsPDF library tidak tersedia');
+            }
+            
+            if (!document.fonts) {
+                issues.push('Browser tidak mendukung Font Loading API');
+            }
+            
+            if (!window.crypto || !window.crypto.randomUUID) {
+                issues.push('Browser tidak mendukung Crypto API');
+            }
+            
+            const canvas = document.createElement('canvas');
+            if (!canvas.getContext || !canvas.getContext('2d')) {
+                issues.push('Browser tidak mendukung HTML5 Canvas');
+            }
+            
+            if (!window.Promise) {
+                issues.push('Browser tidak mendukung Promises');
+            }
+            
+            const userAgent = navigator.userAgent.toLowerCase();
+            if (userAgent.includes('internet explorer')) {
+                issues.push('Internet Explorer tidak didukung');
+            }
+            
+            const isCompatible = issues.length === 0;
+            
+            if (isCompatible) {
+                displayResult('Browser Compatibility', true, 'Browser fully compatible with PDF generation');
+                log('✅ Browser compatibility test passed', 'success');
+            } else {
+                displayResult('Browser Compatibility', false, `Issues found: ${issues.join(', ')}`);
+                log(`❌ Browser compatibility issues: ${issues.join(', ')}`, 'error');
+            }
+            
+            return { isCompatible, issues };
+        }
+        
+        // Test A4 dimension calculations
+        function testA4Dimensions() {
+            log('Testing A4 dimension calculations...', 'info');
+            
+            // Test pixel conversions
+            const a4WidthPixels = Math.round(mmToPixels(A4_WIDTH_MM));
+            const a4HeightPixels = Math.round(mmToPixels(A4_HEIGHT_MM));
+            
+            const expectedWidthPixels = 794;  // 210mm at 96 DPI
+            const expectedHeightPixels = 1123; // 297mm at 96 DPI
+            
+            const widthMatch = a4WidthPixels === expectedWidthPixels;
+            const heightMatch = a4HeightPixels === expectedHeightPixels;
+            
+            displayResult('A4 Width Conversion', widthMatch, 
+                `210mm = ${a4WidthPixels}px (expected: ${expectedWidthPixels}px)`);
+            displayResult('A4 Height Conversion', heightMatch, 
+                `297mm = ${a4HeightPixels}px (expected: ${expectedHeightPixels}px)`);
+            
+            // Test reverse conversion
+            const widthMmBack = Math.round(pixelsToMm(expectedWidthPixels));
+            const heightMmBack = Math.round(pixelsToMm(expectedHeightPixels));
+            
+            const reverseWidthMatch = widthMmBack === A4_WIDTH_MM;
+            const reverseHeightMatch = heightMmBack === A4_HEIGHT_MM;
+            
+            displayResult('Reverse Width Conversion', reverseWidthMatch, 
+                `${expectedWidthPixels}px = ${widthMmBack}mm (expected: ${A4_WIDTH_MM}mm)`);
+            displayResult('Reverse Height Conversion', reverseHeightMatch, 
+                `${expectedHeightPixels}px = ${heightMmBack}mm (expected: ${A4_HEIGHT_MM}mm)`);
+            
+            log(`A4 dimensions: ${A4_WIDTH_MM}mm × ${A4_HEIGHT_MM}mm = ${a4WidthPixels}px × ${a4HeightPixels}px`, 'info');
+            
+            return widthMatch && heightMatch && reverseWidthMatch && reverseHeightMatch;
+        }
+        
+        // Test print safe area calculations
+        function testPrintSafeArea() {
+            log('Testing print safe area calculations...', 'info');
+            
+            const printSafeWidth = A4_WIDTH_MM - 30; // 15mm left + 15mm right
+            const printSafeHeight = A4_HEIGHT_MM - 40; // 20mm top + 20mm bottom
+            
+            const widthCorrect = printSafeWidth === PRINT_SAFE_WIDTH_MM;
+            const heightCorrect = printSafeHeight === PRINT_SAFE_HEIGHT_MM;
+            
+            displayResult('Print Safe Width', widthCorrect, 
+                `${A4_WIDTH_MM}mm - 30mm margins = ${printSafeWidth}mm (expected: ${PRINT_SAFE_WIDTH_MM}mm)`);
+            displayResult('Print Safe Height', heightCorrect, 
+                `${A4_HEIGHT_MM}mm - 40mm margins = ${printSafeHeight}mm (expected: ${PRINT_SAFE_HEIGHT_MM}mm)`);
+            
+            // Test positioning calculations
+            const mockImageWidth = 600;
+            const mockImageHeight = 800;
+            const ratio = mockImageWidth / mockImageHeight;
+            const printSafeRatio = printSafeWidth / printSafeHeight;
+            
+            let finalWidth, finalHeight;
+            
+            if (ratio > printSafeRatio) {
+                finalWidth = printSafeWidth;
+                finalHeight = printSafeWidth / ratio;
+            } else {
+                finalHeight = printSafeHeight;
+                finalWidth = printSafeHeight * ratio;
+            }
+            
+            const xOffset = 15 + Math.round((printSafeWidth - finalWidth) / 2);
+            const yOffset = 20 + Math.round((printSafeHeight - finalHeight) / 2);
+            
+            const positioningCorrect = xOffset >= 15 && yOffset >= 20;
+            
+            displayResult('Content Positioning', positioningCorrect, 
+                `Content positioned at (${xOffset}mm, ${yOffset}mm) with margins preserved`);
+            
+            log(`Print safe area: ${printSafeWidth}mm × ${printSafeHeight}mm`, 'info');
+            log(`Content positioning: (${xOffset}mm, ${yOffset}mm)`, 'info');
+            
+            return widthCorrect && heightCorrect && positioningCorrect;
+        }
+        
+        // Test PDF generation setup
+        function testPDFGeneration() {
+            log('Testing PDF generation setup...', 'info');
+            
+            try {
+                const pdf = new window.jspdf.jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4',
+                    compress: true
+                });
+                
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                const dimensionsCorrect = pdfWidth === A4_WIDTH_MM && pdfHeight === A4_HEIGHT_MM;
+                
+                displayResult('PDF Initialization', true, 'jsPDF initialized successfully');
+                displayResult('PDF Dimensions', dimensionsCorrect, 
+                    `PDF dimensions: ${pdfWidth}mm × ${pdfHeight}mm (expected: ${A4_WIDTH_MM}mm × ${A4_HEIGHT_MM}mm)`);
+                
+                log(`PDF initialized with dimensions: ${pdfWidth}mm × ${pdfHeight}mm`, 'success');
+                
+                return dimensionsCorrect;
+            } catch (error) {
+                displayResult('PDF Initialization', false, `Error: ${error.message}`);
+                log(`❌ PDF initialization failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Test HTML2Canvas functionality
+        async function testHTML2Canvas() {
+            log('Testing HTML2Canvas functionality...', 'info');
+            
+            try {
+                // Create a test element with A4 dimensions
+                const testElement = document.createElement('div');
+                testElement.style.width = '210mm';
+                testElement.style.height = '297mm';
+                testElement.style.background = 'white';
+                testElement.style.position = 'absolute';
+                testElement.style.left = '-9999px';
+                testElement.textContent = 'Test A4 Content';
+                document.body.appendChild(testElement);
+                
+                const canvas = await window.html2canvas(testElement, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    letterRendering: false,
+                    logging: false,
+                    imageTimeout: 5000,
+                    removeContainer: true
+                });
+                
+                document.body.removeChild(testElement);
+                
+                const canvasValid = canvas && canvas.width > 0 && canvas.height > 0;
+                const imageData = canvas.toDataURL('image/png', 1.0);
+                const imageDataValid = imageData && imageData.length > 100 && !imageData.includes('data:,');
+                
+                displayResult('HTML2Canvas Capture', canvasValid, 
+                    `Canvas created: ${canvas.width}px × ${canvas.height}px`);
+                displayResult('Image Data Generation', imageDataValid, 
+                    `Image data generated: ${imageData.length} characters`);
+                
+                log(`HTML2Canvas test completed: ${canvas.width}px × ${canvas.height}px`, 'success');
+                
+                return canvasValid && imageDataValid;
+            } catch (error) {
+                displayResult('HTML2Canvas Test', false, `Error: ${error.message}`);
+                log(`❌ HTML2Canvas test failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Show/hide A4 ruler overlay
+        function showA4Ruler() {
+            document.getElementById('a4-ruler').style.display = 'block';
+            log('A4 size ruler displayed', 'info');
+        }
+        
+        function hideA4Ruler() {
+            document.getElementById('a4-ruler').style.display = 'none';
+            log('A4 size ruler hidden', 'info');
+        }
+        
+        // Run all tests
+        async function runAllTests() {
+            log('Starting comprehensive PDF A4 test suite...', 'info');
+            
+            // Clear previous results
+            document.getElementById('test-results').innerHTML = '';
+            
+            const results = {
+                browserCompatibility: false,
+                a4Dimensions: false,
+                printSafeArea: false,
+                pdfGeneration: false,
+                html2Canvas: false
+            };
+            
+            // Run tests
+            const compatibility = testBrowserCompatibility();
+            results.browserCompatibility = compatibility.isCompatible;
+            
+            results.a4Dimensions = testA4Dimensions();
+            results.printSafeArea = testPrintSafeArea();
+            results.pdfGeneration = testPDFGeneration();
+            results.html2Canvas = await testHTML2Canvas();
+            
+            // Calculate overall result
+            const passedTests = Object.values(results).filter(Boolean).length;
+            const totalTests = Object.keys(results).length;
+            const overallPass = passedTests === totalTests;
+            
+            displayResult('Overall Test Suite', overallPass, 
+                `${passedTests}/${totalTests} tests passed`, !overallPass);
+            
+            log(`Test suite completed: ${passedTests}/${totalTests} tests passed`, 
+                overallPass ? 'success' : 'warning');
+            
+            if (overallPass) {
+                log('🎉 All tests passed! PDF A4 implementation is correct.', 'success');
+            } else {
+                log('⚠️ Some tests failed. Please review the implementation.', 'warning');
+            }
+            
+            return results;
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateScreenDPI();
+            log('Manual PDF A4 test page loaded', 'info');
+            log('Click "Run All Tests" to start comprehensive testing', 'info');
+        });
+    </script>
+</body>
+</html>

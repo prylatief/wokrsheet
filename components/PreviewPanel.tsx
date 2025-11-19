@@ -470,74 +470,131 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
 };
 
 
-// Height estimation utility - should match App.tsx
+// A4 dimensions and conversion constants for mm-based calculations - should match App.tsx
+const A4_PRINT_SAFE_HEIGHT_MM = 257; // 297mm - 20mm top - 20mm bottom
+const A4_PRINT_SAFE_HEIGHT_UNITS = 100; // Normalized units for calculation
+const MM_TO_UNITS = A4_PRINT_SAFE_HEIGHT_UNITS / A4_PRINT_SAFE_HEIGHT_MM;
+
+// Height estimation utility using mm-based calculations - should match App.tsx
 const estimateExerciseHeight = (exercise: Exercise): number => {
-  const baseHeight = 8;
+  const baseHeightMm = 15; // Base padding and margins for each exercise card in mm
+  const baseHeight = baseHeightMm * MM_TO_UNITS;
+
   switch (exercise.type) {
     case ExerciseType.COUNTING:
-      return baseHeight + 6 + Math.ceil(exercise.config.count / 5) * 3;
+      // Title + emojis + answer line
+      const countingContentMm = 12 + Math.ceil(exercise.config.count / 5) * 8; // 12mm title + 8mm per row
+      return baseHeight + (countingContentMm * MM_TO_UNITS);
+
     case ExerciseType.ADDITION:
     case ExerciseType.SUBTRACTION:
-      const helpersHeight = exercise.config.showHelpers ? 4 : 0;
-      return baseHeight + 6 + helpersHeight;
+      // Title + equation + optional helpers
+      const equationContentMm = 12; // 12mm for title and equation
+      const helpersHeightMm = exercise.config.showHelpers ? 10 : 0; // 10mm for helpers
+      return baseHeight + ((equationContentMm + helpersHeightMm) * MM_TO_UNITS);
+
     case ExerciseType.TRACING:
-      return baseHeight + 8;
+      // Title + large text
+      const tracingContentMm = 20; // 20mm for title and large text
+      return baseHeight + (tracingContentMm * MM_TO_UNITS);
+
     case ExerciseType.DRAWING:
-      return baseHeight + 18;
+      // Title + instruction + drawing area
+      const drawingContentMm = 45; // 45mm for title, instruction and drawing area
+      return baseHeight + (drawingContentMm * MM_TO_UNITS);
+
     case ExerciseType.PATTERN:
-      return baseHeight + 8;
+      // Title + pattern items
+      const patternContentMm = 20; // 20mm for title and pattern items
+      return baseHeight + (patternContentMm * MM_TO_UNITS);
+
     case ExerciseType.MATCHING:
+      // Title + matching pairs (depends on number of pairs)
       const pairCount = exercise.config.pairs.length;
-      return baseHeight + 6 + (pairCount * 2);
+      const matchingContentMm = 12 + (pairCount * 5); // 12mm title + 5mm per pair
+      return baseHeight + (matchingContentMm * MM_TO_UNITS);
+
     case ExerciseType.SPELLING:
-      return baseHeight + 10;
+      // Title + emoji + letter boxes
+      const spellingContentMm = 25; // 25mm for title, emoji and letter boxes
+      return baseHeight + (spellingContentMm * MM_TO_UNITS);
+
     case ExerciseType.COLORING:
-      return baseHeight + 22;
+      // Title + instruction + SVG
+      const coloringContentMm = 55; // 55mm for title, instruction and SVG
+      return baseHeight + (coloringContentMm * MM_TO_UNITS);
+
     case ExerciseType.MAZE:
-      return baseHeight + 22;
+      // Title + instruction + SVG
+      const mazeContentMm = 55; // 55mm for title, instruction and SVG
+      return baseHeight + (mazeContentMm * MM_TO_UNITS);
+
     case ExerciseType.JUZ_AMMA:
+      // Title + verses (depends on exercise type and verse count)
       const verseCount = exercise.config.verses?.length || 1;
       const { exerciseType: juzExType } = exercise.config;
+      let juzContentMm = 12; // Base 12mm for title
+      
       if (juzExType === 'matching') {
-        return baseHeight + 8 + (verseCount * 5);
+        juzContentMm += verseCount * 12; // 12mm per verse for matching
+      } else if (juzExType === 'tracing') {
+        juzContentMm += verseCount * 15; // 15mm per verse for tracing
+      } else if (juzExType === 'complete_verse') {
+        juzContentMm += verseCount * 20; // 20mm per verse for complete verse
+      } else {
+        // fill_blank
+        juzContentMm += verseCount * 10; // 10mm per verse for fill blank
       }
-      if (juzExType === 'tracing') {
-        return baseHeight + 10 + (verseCount * 6);
-      }
-      if (juzExType === 'complete_verse') {
-        return baseHeight + 8 + (verseCount * 8);
-      }
-      // fill_blank
-      return baseHeight + 8 + (verseCount * 4);
+      return baseHeight + (juzContentMm * MM_TO_UNITS);
+
     case ExerciseType.COLOR_CODING:
-      const colorCount = exercise.config.colors?.length || 3;
-      return baseHeight + 10 + Math.ceil(colorCount / 3) * 3;
+      // Title + color sequence/matching/pattern
+      const colorCodingContentMm = 30; // 30mm for title and color elements
+      return baseHeight + (colorCodingContentMm * MM_TO_UNITS);
+
     case ExerciseType.SEQUENCE_CODING:
+      // Title + sequence steps
       const stepCount = exercise.config.steps?.length || 3;
-      return baseHeight + 8 + (stepCount * 4);
+      const sequenceContentMm = 12 + (stepCount * 8); // 12mm title + 8mm per step
+      return baseHeight + (sequenceContentMm * MM_TO_UNITS);
+
     case ExerciseType.IF_THEN_LOGIC:
+      // Title + rules + items grid
       const ruleCount = exercise.config.rules?.length || 2;
       const itemCount = exercise.config.items || 10;
-      return baseHeight + 12 + (ruleCount * 4) + Math.ceil(itemCount / 5) * 4;
+      const logicContentMm = 12 + (ruleCount * 6) + Math.ceil(itemCount / 5) * 8; // 12mm title + 6mm per rule + 8mm per row of items
+      return baseHeight + (logicContentMm * MM_TO_UNITS);
+
     case ExerciseType.PIXEL_ART:
-      const rows = exercise.config.gridRows || 8;
-      const cols = exercise.config.gridCols || 8;
-      return baseHeight + 12 + Math.ceil((rows * cols) / 20);
+      // Title + grid (depends on grid size)
+      const gridSize = Math.max(exercise.config.gridRows || 8, exercise.config.gridCols || 8);
+      const pixelContentMm = 12 + Math.min(gridSize * 3, 50); // 12mm title + 3mm per grid unit, max 50mm
+      return baseHeight + (pixelContentMm * MM_TO_UNITS);
+
     default:
-      return baseHeight + 10;
+      const defaultContentMm = 25; // 25mm default content height
+      return baseHeight + (defaultContentMm * MM_TO_UNITS);
   }
 };
 
 const calculatePageHeight = (exercises: Exercise[]): number => {
-  const headerHeight = 10;
-  const exerciseSpacing = 2;
+  // A4 optimized header height calculation (school info + name/class + title)
+  const schoolHeaderHeight = 3; // School info header in units
+  const nameClassHeaderHeight = 10; // Name/class header (25mm converted to units)
+  const titleHeight = 5; // Title section in units
+  const headerHeight = schoolHeaderHeight + nameClassHeaderHeight + titleHeight;
+  
+  // A4 optimized exercise spacing
+  const exerciseSpacing = 2; // Consistent spacing between exercises
+  
   const exercisesHeight = exercises.reduce((total, ex) => {
     return total + estimateExerciseHeight(ex) + exerciseSpacing;
   }, 0);
+  
   return headerHeight + exercisesHeight;
 };
 
-const MAX_PAGE_HEIGHT = 85;
+const MAX_PAGE_HEIGHT = A4_PRINT_SAFE_HEIGHT_UNITS; // Based on A4 print safe height (257mm)
 
 interface PreviewPanelProps {
   worksheet: Worksheet;
@@ -621,7 +678,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
         </button>
       </div>
 
-      {/* Page Capacity Indicator */}
+      {/* A4 Page Capacity Indicator */}
       {currentPageExercises.length > 0 && (
         <div className={`rounded-xl shadow-md p-4 no-print ${isOverfull ? 'bg-red-50 border-2 border-red-300' : isNearlyFull ? 'bg-yellow-50 border-2 border-yellow-300' : 'bg-green-50 border-2 border-green-300'}`}>
           <div className="flex items-center justify-between mb-2">
@@ -629,21 +686,24 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
               {isOverfull ? (
                 <>
                   <span className="text-xl">⚠️</span>
-                  <span className="text-red-700">Halaman Terlalu Penuh!</span>
+                  <span className="text-red-700">Melebihi Area Cetak A4!</span>
                 </>
               ) : isNearlyFull ? (
                 <>
                   <span className="text-xl">⚡</span>
-                  <span className="text-yellow-700">Halaman Hampir Penuh</span>
+                  <span className="text-yellow-700">Mendekati Batas A4</span>
                 </>
               ) : (
                 <>
                   <span className="text-xl">✅</span>
-                  <span className="text-green-700">Kapasitas Halaman Baik</span>
+                  <span className="text-green-700">Optimal untuk A4</span>
                 </>
               )}
             </span>
-            <span className="text-sm font-bold">{Math.round(pageFullness)}%</span>
+            <div className="text-right">
+              <span className="text-sm font-bold">{Math.round(pageFullness)}%</span>
+              <div className="text-xs text-gray-600">dari area cetak A4</div>
+            </div>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
             <div
@@ -651,22 +711,31 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
               style={{ width: `${Math.min(pageFullness, 100)}%` }}
             ></div>
           </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>Print Safe Area: 180×257mm</span>
+            <span>A4: 210×297mm</span>
+          </div>
           {isOverfull && (
             <p className="text-xs text-red-600 mt-2 font-medium">
-              💡 Konten melebihi ukuran A4. Pindahkan beberapa latihan ke halaman berikutnya untuk hasil cetak terbaik.
+              📏 Konten melebihi area cetak aman A4 (257mm tinggi). Beberapa bagian mungkin terpotong saat dicetak. Pindahkan latihan ke halaman berikutnya.
             </p>
           )}
           {isNearlyFull && !isOverfull && (
             <p className="text-xs text-yellow-600 mt-2 font-medium">
-              💡 Halaman hampir penuh. Latihan berikutnya akan otomatis pindah ke halaman baru.
+              📐 Halaman mendekati batas area cetak A4. Latihan berikutnya akan otomatis pindah ke halaman baru untuk hasil cetak optimal.
+            </p>
+          )}
+          {!isNearlyFull && (
+            <p className="text-xs text-green-600 mt-2 font-medium">
+              📄 Halaman memiliki ruang yang cukup untuk latihan tambahan dengan margin cetak yang aman.
             </p>
           )}
         </div>
       )}
 
-      {/* Preview Area */}
-      <div id="printable-area-container" className="bg-gradient-to-br from-blue-100 to-purple-100 p-4 md:p-8 rounded-2xl shadow-inner">
-        <div id="printable-area" className={`w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-[210mm] min-h-[297mm] ${worksheet.theme === 'default' ? 'bg-white' : ''} mx-auto shadow-2xl p-4 sm:p-6 md:p-8 font-comic text-slate-800 transition-colors duration-300 rounded-lg ${borderClass} ${themeClass}`}>
+      {/* Preview Area - A4 Optimized Container */}
+      <div id="printable-area-container" className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl shadow-inner" style={{ padding: '15mm' }}>
+        <div id="printable-area" className={`w-[210mm] h-[297mm] ${worksheet.theme === 'default' ? 'bg-white' : ''} mx-auto shadow-2xl font-comic text-slate-800 transition-colors duration-300 rounded-lg ${borderClass} ${themeClass}`} style={{ padding: '20mm 15mm', boxSizing: 'border-box' }}>
         {/* School Header */}
         {(worksheet.schoolInfo.schoolName || worksheet.schoolInfo.teacherName || worksheet.schoolInfo.logoUrl) && (
           <div className="flex items-center justify-between mb-3 pb-2 border-b-2 border-purple-200 print:mb-2">
@@ -690,7 +759,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
           </div>
         )}
 
-        <header className="flex justify-between items-baseline border-b-2 border-purple-300 pb-3 mb-5 print:pb-2 print:mb-4">
+        <header className="flex justify-between items-baseline border-b-2 border-purple-300 h-[25mm]" style={{ paddingBottom: '8mm', marginBottom: '10mm' }}>
           <div className="text-base font-bold print:text-sm flex items-baseline">
             <span>Nama:</span>
             <span className="answer-line border-purple-400 w-56 print:w-40"></span>
@@ -701,7 +770,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
           </div>
         </header>
 
-        <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 p-3 rounded-xl mb-6 shadow-md print:p-2 print:mb-4 print:rounded-lg">
+        <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 p-3 rounded-xl shadow-md print:p-2 print:rounded-lg" style={{ marginBottom: '10mm' }}>
           <h1 className="text-3xl font-bold text-center text-white drop-shadow-md print:text-2xl print:drop-shadow-sm">{worksheet.title}</h1>
         </div>
 

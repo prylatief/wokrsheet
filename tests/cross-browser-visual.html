@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross-Browser PDF Generation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .browser-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .capability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .capability-card {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .capability-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-supported { background: #d4edda; color: #155724; }
+        .status-not-supported { background: #f8d7da; color: #721c24; }
+        .status-partial { background: #fff3cd; color: #856404; }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .test-pass {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .test-fail {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .test-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .log-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .performance-chart {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌐 Cross-Browser PDF Generation Test</h1>
+    <p>This page tests PDF generation compatibility across different browsers and configurations.</p>
+    
+    <div class="test-container">
+        <h2>🎯 Test Controls</h2>
+        <button class="test-button" onclick="detectBrowserInfo()">Detect Browser Info</button>
+        <button class="test-button" onclick="testCapabilities()">Test Capabilities</button>
+        <button class="test-button" onclick="testPDFGeneration()">Test PDF Generation</button>
+        <button class="test-button" onclick="runPerformanceBenchmark()">Performance Benchmark</button>
+        <button class="test-button" onclick="testZoomLevels()">Test Zoom Levels</button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div class="test-container">
+        <h2>🖥️ Browser Information</h2>
+        <div id="browser-info" class="browser-info">
+            <!-- Browser info will be populated by JavaScript -->
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>⚙️ Browser Capabilities</h2>
+        <div id="capabilities-grid" class="capability-grid">
+            <!-- Capabilities will be populated by JavaScript -->
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📊 Performance Metrics</h2>
+        <div id="performance-chart" class="performance-chart">
+            <p>Click "Performance Benchmark" to test PDF generation speed.</p>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📊 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📝 Test Log</h2>
+        <div id="log-output" class="log-output">Ready to run cross-browser tests...\n</div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="tests/cross-browser.test.js"></script>
+    
+    <script>
+        // Additional browser-specific functionality for the visual test page
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logOutput = document.getElementById('log-output');
+            const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+            logOutput.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log-output').textContent = 'Log cleared...\n';
+        }
+        
+        // Display test result
+        function displayResult(testName, passed, message, isWarning = false) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'test-pass' : isWarning ? 'test-warning' : 'test-fail'}`;
+            resultDiv.innerHTML = `<strong>${testName}:</strong> ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        // Detect and display browser information
+        function detectBrowserInfo() {
+            log('Detecting browser information...', 'info');
+            
+            const browserInfo = detectBrowser();
+            const capabilities = detectBrowserCapabilities();
+            const zoomInfo = detectZoomLevel();
+            
+            const browserInfoDiv = document.getElementById('browser-info');
+            browserInfoDiv.innerHTML = `
+                <div class="info-card">
+                    <h4>Browser</h4>
+                    <p><strong>${browserInfo.name} ${browserInfo.version}</strong></p>
+                    <p>User Agent: ${navigator.userAgent.substring(0, 50)}...</p>
+                </div>
+                <div class="info-card">
+                    <h4>Screen Resolution</h4>
+                    <p><strong>${capabilities.screenResolution?.width || 'Unknown'}×${capabilities.screenResolution?.height || 'Unknown'}</strong></p>
+                    <p>Available: ${capabilities.screenResolution?.availWidth || 'Unknown'}×${capabilities.screenResolution?.availHeight || 'Unknown'}</p>
+                    <p>Color Depth: ${capabilities.colorDepth || 'Unknown'} bits</p>
+                </div>
+                <div class="info-card">
+                    <h4>Display Settings</h4>
+                    <p><strong>Zoom Level: ${(zoomInfo.estimated * 100).toFixed(0)}%</strong></p>
+                    <p>Device Pixel Ratio: ${capabilities.devicePixelRatio}</p>
+                    <p>Touch Support: ${capabilities.touchSupport ? 'Yes' : 'No'}</p>
+                </div>
+                <div class="info-card">
+                    <h4>Environment</h4>
+                    <p><strong>Platform: ${navigator.platform}</strong></p>
+                    <p>Language: ${navigator.language}</p>
+                    <p>Online: ${navigator.onLine ? 'Yes' : 'No'}</p>
+                </div>
+            `;
+            
+            log(`Browser detected: ${browserInfo.name} ${browserInfo.version}`, 'success');
+            log(`Screen: ${capabilities.screenResolution?.width}×${capabilities.screenResolution?.height}, Zoom: ${(zoomInfo.estimated * 100).toFixed(0)}%`, 'info');
+        }
+        
+        // Test and display browser capabilities
+        function testCapabilities() {
+            log('Testing browser capabilities...', 'info');
+            
+            const capabilities = detectBrowserCapabilities();
+            const fontResults = testFontRendering();
+            
+            const capabilitiesDiv = document.getElementById('capabilities-grid');
+            
+            const capabilityTests = [
+                { name: 'HTML5 Canvas', supported: capabilities.canvas, critical: true },
+                { name: 'WebGL', supported: capabilities.webGL, critical: false },
+                { name: 'html2canvas Library', supported: capabilities.html2canvas, critical: true },
+                { name: 'jsPDF Library', supported: capabilities.jsPDF, critical: true },
+                { name: 'Font Loading API', supported: capabilities.fontLoading, critical: false },
+                { name: 'Promises', supported: capabilities.promises, critical: true },
+                { name: 'Crypto API', supported: capabilities.crypto, critical: false },
+                { name: 'Local Storage', supported: capabilities.localStorage, critical: false },
+                { name: 'Arial Font', supported: fontResults['Arial']?.available, critical: true },
+                { name: 'Comic Neue Font', supported: fontResults['Comic Neue']?.available, critical: false },
+                { name: 'Amiri Font (Arabic)', supported: fontResults['Amiri']?.available, critical: false }
+            ];
+            
+            capabilitiesDiv.innerHTML = '';
+            
+            capabilityTests.forEach(test => {
+                const statusClass = test.supported ? 'status-supported' : 
+                                  test.critical ? 'status-not-supported' : 'status-partial';
+                const statusText = test.supported ? 'Supported' : 'Not Supported';
+                
+                const card = document.createElement('div');
+                card.className = 'capability-card';
+                card.innerHTML = `
+                    <h4>${test.name} <span class="capability-status ${statusClass}">${statusText}</span></h4>
+                    <p>${test.critical ? 'Critical for PDF generation' : 'Optional enhancement'}</p>
+                `;
+                capabilitiesDiv.appendChild(card);
+            });
+            
+            const supportedCount = capabilityTests.filter(test => test.supported).length;
+            const criticalCount = capabilityTests.filter(test => test.critical && test.supported).length;
+            const totalCritical = capabilityTests.filter(test => test.critical).length;
+            
+            displayResult('Browser Capabilities', criticalCount === totalCritical,
+                `${supportedCount}/${capabilityTests.length} capabilities supported (${criticalCount}/${totalCritical} critical)`);
+            
+            log(`Capabilities test completed: ${supportedCount}/${capabilityTests.length} supported`, 
+                criticalCount === totalCritical ? 'success' : 'warning');
+        }
+        
+        // Test PDF generation functionality
+        async function testPDFGeneration() {
+            log('Testing PDF generation...', 'info');
+            
+            try {
+                const pdfResults = await testPDFGenerationCompatibility();
+                
+                const tests = [
+                    { name: 'jsPDF Initialization', passed: pdfResults.jsPDFInit },
+                    { name: 'html2canvas Initialization', passed: pdfResults.html2canvasInit },
+                    { name: 'Canvas Creation', passed: pdfResults.canvasCreation },
+                    { name: 'Image Data Generation', passed: pdfResults.imageDataGeneration },
+                    { name: 'PDF Creation', passed: pdfResults.pdfCreation }
+                ];
+                
+                tests.forEach(test => {
+                    displayResult(test.name, test.passed, 
+                        test.passed ? 'Working correctly' : 'Failed');
+                });
+                
+                if (pdfResults.errors.length > 0) {
+                    displayResult('PDF Generation Errors', false, 
+                        pdfResults.errors.join('; '));
+                    pdfResults.errors.forEach(error => log(error, 'error'));
+                }
+                
+                const overallSuccess = tests.every(test => test.passed);
+                displayResult('Overall PDF Generation', overallSuccess,
+                    overallSuccess ? 'All tests passed' : 'Some tests failed');
+                
+                log(`PDF generation test completed: ${overallSuccess ? 'success' : 'failed'}`, 
+                    overallSuccess ? 'success' : 'error');
+                
+            } catch (error) {
+                displayResult('PDF Generation Test', false, `Error: ${error.message}`);
+                log(`PDF generation test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Run performance benchmark
+        async function runPerformanceBenchmark() {
+            log('Running performance benchmark...', 'info');
+            
+            try {
+                const perfResults = await benchmarkPerformance();
+                
+                const performanceDiv = document.getElementById('performance-chart');
+                performanceDiv.innerHTML = `
+                    <h4>Performance Results</h4>
+                    <div>
+                        <p>Canvas Creation: ${perfResults.canvasCreationTime.toFixed(0)}ms</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${Math.min(perfResults.canvasCreationTime / 50, 100)}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p>Image Data Generation: ${perfResults.imageDataTime.toFixed(0)}ms</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${Math.min(perfResults.imageDataTime / 20, 100)}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p>PDF Generation: ${perfResults.pdfGenerationTime.toFixed(0)}ms</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${Math.min(perfResults.pdfGenerationTime / 10, 100)}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p><strong>Total Time: ${perfResults.totalTime.toFixed(0)}ms</strong></p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${Math.min(perfResults.totalTime / 100, 100)}%"></div>
+                        </div>
+                    </div>
+                `;
+                
+                const isGoodPerformance = perfResults.totalTime < 5000; // Less than 5 seconds
+                displayResult('Performance Benchmark', isGoodPerformance,
+                    `Total time: ${perfResults.totalTime.toFixed(0)}ms (${isGoodPerformance ? 'Good' : 'Slow'})`);
+                
+                log(`Performance benchmark completed: ${perfResults.totalTime.toFixed(0)}ms total`, 
+                    isGoodPerformance ? 'success' : 'warning');
+                
+            } catch (error) {
+                displayResult('Performance Benchmark', false, `Error: ${error.message}`);
+                log(`Performance benchmark failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test different zoom levels
+        function testZoomLevels() {
+            log('Testing zoom level compatibility...', 'info');
+            
+            const zoomInfo = detectZoomLevel();
+            const currentZoom = zoomInfo.estimated;
+            
+            const zoomTests = [
+                { level: 0.5, name: '50%' },
+                { level: 0.75, name: '75%' },
+                { level: 1.0, name: '100%' },
+                { level: 1.25, name: '125%' },
+                { level: 1.5, name: '150%' },
+                { level: 2.0, name: '200%' }
+            ];
+            
+            zoomTests.forEach(test => {
+                const isCurrentZoom = Math.abs(currentZoom - test.level) < 0.1;
+                const isSupported = test.level >= 0.5 && test.level <= 2.0;
+                
+                displayResult(`Zoom Level ${test.name}`, isSupported,
+                    `${isCurrentZoom ? 'Current zoom level - ' : ''}${isSupported ? 'Supported' : 'May have issues'}`);
+            });
+            
+            displayResult('Current Zoom Detection', true,
+                `Detected zoom level: ${(currentZoom * 100).toFixed(0)}%`);
+            
+            log(`Zoom level test completed: Current zoom ${(currentZoom * 100).toFixed(0)}%`, 'info');
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Cross-browser test page loaded', 'info');
+            
+            // Auto-detect browser info on load
+            detectBrowserInfo();
+            
+            log('Click test buttons to run specific compatibility tests', 'info');
+        });
+    </script>
+</body>
+</html>

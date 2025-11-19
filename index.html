@@ -321,32 +321,76 @@
         }
       }
 
+      /* Fixed A4 dimensions for printable area */
+      #printable-area {
+        width: 210mm;
+        height: 297mm;
+        padding: 20mm 15mm;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      /* Ensure consistent dimensions across all screen sizes */
+      @media screen {
+        #printable-area {
+          max-width: 210mm;
+          min-height: 297mm;
+        }
+      }
+
       @media print {
+        /* Set exact A4 page size with no margins */
+        @page {
+          size: A4 portrait;
+          margin: 0;
+        }
+        
+        /* Reset body for print */
         body {
           margin: 0;
           padding: 0;
           background: white;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
         }
+        
+        html, body {
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+        }
+        
+        /* Hide non-printable elements */
         .no-print {
           display: none !important;
         }
+        
+        /* Container adjustments */
         #printable-area-container {
           padding: 0 !important;
           margin: 0 !important;
           background: white !important;
         }
+        
+        /* Fix printable area dimensions untuk print (210mm x 297mm) */
+        /* Update padding untuk print safe margins (20mm 15mm) */
+        /* Ensure box-sizing: border-box untuk accurate sizing */
         #printable-area {
+          width: 210mm !important;
+          height: 297mm !important;
+          max-width: 210mm !important;
+          min-height: 297mm !important;
           margin: 0 !important;
-          padding: 1.2cm 1cm 1cm 1cm !important;
+          padding: 20mm 15mm !important;
+          box-sizing: border-box !important;
           box-shadow: none !important;
-          width: 21cm !important;
-          height: auto !important;
-          min-height: 29.7cm !important;
-          max-width: 21cm !important;
-          page-break-inside: avoid;
           border-radius: 0 !important;
           overflow: visible !important;
+          page-break-inside: avoid;
+          background: white !important;
         }
+        
         /* Ensure Arabic text renders perfectly in PDF */
         .font-arabic {
           text-rendering: optimizeLegibility !important;
@@ -354,6 +398,7 @@
           -moz-osx-font-smoothing: grayscale !important;
           font-synthesis: none !important;
         }
+        
         /* Ensure theme backgrounds print properly */
         .theme-space,
         .theme-ocean,
@@ -361,6 +406,7 @@
           print-color-adjust: exact;
           -webkit-print-color-adjust: exact;
         }
+        
         /* Ensure border decorations print properly - keep consistent with screen */
         .border-simple,
         .border-stars,
@@ -372,7 +418,9 @@
         .border-clouds,
         .border-music {
           border-width: 6pt !important;
+          box-sizing: border-box !important;
         }
+        
         /* Ensure decorative elements print properly with adjusted positioning */
         .border-flowers::before,
         .border-hearts::before,
@@ -385,19 +433,160 @@
           font-size: 18px !important;
           letter-spacing: 8px !important;
         }
-        html, body {
-          print-color-adjust: exact;
-          -webkit-print-color-adjust: exact;
-          color-adjust: exact;
-        }
-        @page {
-          size: A4 portrait;
-          margin: 0;
-        }
+        
         /* Optimize exercise cards for print */
         .exercise-card {
           page-break-inside: avoid;
           break-inside: avoid;
+          box-sizing: border-box !important;
+        }
+        
+        /* Optimize font sizes dan spacing untuk A4 */
+        /* Review dan adjust font sizes untuk optimal readability di A4 */
+        /* Update line heights untuk better spacing di print */
+        /* Ensure text tidak terlalu kecil atau besar untuk A4 format */
+        
+        /* Base font size optimization for A4 */
+        body {
+          font-size: 14px !important; /* Optimal base size for A4 readability */
+          line-height: 1.4 !important; /* Improved line spacing for print */
+        }
+        
+        /* Header font sizes - optimized for A4 proportions */
+        h1 {
+          font-size: 24px !important; /* Main title - readable but not overwhelming */
+          line-height: 1.2 !important;
+          margin-bottom: 8mm !important;
+        }
+        
+        /* Exercise title optimization */
+        .exercise-card p:first-child,
+        .text-lg {
+          font-size: 16px !important; /* Exercise titles - clear and prominent */
+          line-height: 1.3 !important;
+          margin-bottom: 6mm !important;
+        }
+        
+        /* Body text optimization */
+        .text-base {
+          font-size: 14px !important; /* Standard body text */
+          line-height: 1.4 !important;
+        }
+        
+        .text-sm {
+          font-size: 12px !important; /* Small text - still readable */
+          line-height: 1.3 !important;
+        }
+        
+        .text-xs {
+          font-size: 10px !important; /* Extra small text - minimum readable size */
+          line-height: 1.2 !important;
+        }
+        
+        /* Large display text optimization */
+        .text-4xl {
+          font-size: 28px !important; /* Math equations, patterns */
+          line-height: 1.1 !important;
+        }
+        
+        .text-3xl {
+          font-size: 24px !important; /* Large display elements */
+          line-height: 1.1 !important;
+        }
+        
+        .text-2xl {
+          font-size: 20px !important; /* Medium display elements */
+          line-height: 1.2 !important;
+        }
+        
+        .text-xl {
+          font-size: 18px !important; /* Slightly larger text */
+          line-height: 1.3 !important;
+        }
+        
+        /* Extra large text for tracing and special elements */
+        .text-6xl {
+          font-size: 36px !important; /* Tracing text - needs to be large but printable */
+          line-height: 1.0 !important;
+        }
+        
+        .text-5xl {
+          font-size: 32px !important; /* Large emojis and symbols */
+          line-height: 1.0 !important;
+        }
+        
+        /* Arabic text optimization */
+        .font-arabic {
+          font-size: 18px !important; /* Slightly larger for Arabic readability */
+          line-height: 1.6 !important; /* Better spacing for Arabic text */
+        }
+        
+        /* Spacing optimizations for A4 */
+        .space-y-5 > * + * {
+          margin-top: 4mm !important; /* Consistent exercise spacing */
+        }
+        
+        .space-y-4 > * + * {
+          margin-top: 3mm !important; /* Tighter spacing for print */
+        }
+        
+        .space-y-3 > * + * {
+          margin-top: 2.5mm !important; /* Small element spacing */
+        }
+        
+        .space-y-2 > * + * {
+          margin-top: 2mm !important; /* Minimal spacing */
+        }
+        
+        /* Margin and padding optimizations */
+        .mb-6 {
+          margin-bottom: 5mm !important; /* Exercise card bottom margin */
+        }
+        
+        .mb-5 {
+          margin-bottom: 4mm !important;
+        }
+        
+        .mb-4 {
+          margin-bottom: 3mm !important;
+        }
+        
+        .mb-3 {
+          margin-bottom: 2.5mm !important;
+        }
+        
+        .mb-2 {
+          margin-bottom: 2mm !important;
+        }
+        
+        .p-5 {
+          padding: 4mm !important; /* Exercise card padding */
+        }
+        
+        .p-4 {
+          padding: 3mm !important;
+        }
+        
+        .p-3 {
+          padding: 2.5mm !important;
+        }
+        
+        /* Gap optimizations for flexbox layouts */
+        .gap-4 {
+          gap: 3mm !important;
+        }
+        
+        .gap-3 {
+          gap: 2.5mm !important;
+        }
+        
+        .gap-2 {
+          gap: 2mm !important;
+        }
+        
+        /* Ensure all elements use border-box sizing for accurate measurements */
+        * {
+          box-sizing: border-box !important;
         }
       }
     </style>
