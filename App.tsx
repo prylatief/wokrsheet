@@ -448,16 +448,18 @@ const MainApp: React.FC = () => {
         // Update progress for rendering
         setDownloadProgress(Math.floor(20 + (i * progressPerPage * 0.3)));
 
-        // Capture content at high resolution with improved settings for Arabic text
+        // Capture content at optimal resolution with improved settings for Arabic text
         const canvas = await window.html2canvas(printableArea, {
-          scale: 3, // Increased scale for better Arabic text rendering
+          scale: 2, // Reduced from 3 to 2 for more stable border rendering
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
-          letterRendering: true, // Better text rendering
+          letterRendering: false, // Disabled to prevent sub-pixel text shifts
           logging: false,
           imageTimeout: 0,
           removeContainer: true,
+          windowWidth: printableArea.scrollWidth,
+          windowHeight: printableArea.scrollHeight,
         });
 
         // Update progress for canvas processing
@@ -488,9 +490,9 @@ const MainApp: React.FC = () => {
           finalWidth = pdfHeight * ratio;
         }
 
-        // Center the image on the page
-        const xOffset = (pdfWidth - finalWidth) / 2;
-        const yOffset = (pdfHeight - finalHeight) / 2;
+        // Center the image on the page - round to avoid sub-pixel rendering issues
+        const xOffset = Math.round((pdfWidth - finalWidth) / 2);
+        const yOffset = Math.round((pdfHeight - finalHeight) / 2);
 
         // Add the image to PDF with higher quality
         pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
