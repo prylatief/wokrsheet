@@ -25,7 +25,7 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
               ))}
             </div>
             <div className="mt-5 print:mt-3">
-              <p className="text-base font-semibold print:text-sm">Jumlah: <span className="inline-block answer-line border-slate-600 w-20 ml-2"></span></p>
+              <p className="text-base font-semibold print:text-sm">Jumlah: <span className="inline-block answer-line border-slate-600 w-32 ml-2"></span></p>
             </div>
           </div>
         );
@@ -41,7 +41,7 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
               <span className="text-purple-600">{operator}</span>
               <span>{num2}</span>
               <span className="text-purple-600">=</span>
-              <span className="inline-block border-b-3 border-slate-700 w-20 print:w-16"></span>
+              <span className="inline-block border-b-3 border-slate-700 w-32 print:w-24"></span>
             </div>
             {showHelpers && (
               <div className="flex justify-center items-center mt-4 space-x-6 print:mt-3 print:space-x-4">
@@ -693,11 +693,11 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({ worksheet, currentPa
         <header className="flex justify-between items-baseline border-b-2 border-purple-300 pb-3 mb-5 print:pb-2 print:mb-4">
           <div className="text-base font-bold print:text-sm flex items-baseline">
             <span>Nama:</span>
-            <span className="answer-line border-purple-400 w-40 print:w-32"></span>
+            <span className="answer-line border-purple-400 w-56 print:w-40"></span>
           </div>
           <div className="text-base font-bold print:text-sm flex items-baseline">
             <span>Kelas:</span>
-            <span className="answer-line border-purple-400 w-20 print:w-16"></span>
+            <span className="answer-line border-purple-400 w-32 print:w-24"></span>
           </div>
         </header>
 
