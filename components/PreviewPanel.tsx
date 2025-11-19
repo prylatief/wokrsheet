@@ -36,7 +36,7 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
         return (
           <div>
             <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base print:mb-2">{exercise.config.title}</p>
-            <div className="flex justify-center items-center text-4xl font-bold font-comic space-x-3 print:text-3xl print:space-x-2">
+            <div className="flex justify-center items-baseline text-4xl font-bold font-comic space-x-3 print:text-3xl print:space-x-2">
               <span>{num1}</span>
               <span className="text-purple-600">{operator}</span>
               <span>{num2}</span>
