@@ -41,7 +41,7 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
               <span className="text-purple-600">{operator}</span>
               <span>{num2}</span>
               <span className="text-purple-600">=</span>
-              <span className="inline-block border-b-3 border-slate-700 w-32 print:w-24"></span>
+              <span className="inline-block border-b-3 border-slate-700 w-32 print:w-24 align-baseline"></span>
             </div>
             {showHelpers && (
               <div className="flex justify-center items-center mt-4 space-x-6 print:mt-3 print:space-x-4">
@@ -70,9 +70,9 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
         return (
           <div>
             <p className="text-lg font-bold text-center mb-3 text-purple-700 print:text-base print:mb-2">{exercise.config.title}</p>
-            <div className="flex justify-center items-center text-5xl font-bold font-comic space-x-3 print:text-4xl print:space-x-2">
+            <div className="flex justify-center items-baseline text-5xl font-bold font-comic space-x-3 print:text-4xl print:space-x-2">
               {exercise.config.items.map((item, i) => <span key={i}>{item}</span>)}
-              <span className="inline-block border-b-3 border-slate-700 w-20 print:w-16"></span>
+              <span className="inline-block border-b-3 border-slate-700 w-20 print:w-16 align-baseline"></span>
             </div>
           </div>
         );
@@ -95,9 +95,9 @@ const ExerciseRenderer: React.FC<{ exercise: Exercise; index: number }> = ({ exe
           <div>
             <p className="text-lg font-bold text-center mb-2 text-purple-700 print:text-base">{exercise.config.title}</p>
             <div className="text-6xl text-center mb-4 print:text-5xl print:mb-3">{exercise.config.emojiHint}</div>
-            <div className="flex justify-center items-center gap-2 print:gap-1">
+            <div className="flex justify-center items-end gap-2 print:gap-1">
               {exercise.config.word.split('').map((_, i) => (
-                <div key={i} className="w-14 h-14 border-b-3 border-slate-700 flex items-center justify-center text-4xl font-bold print:w-12 print:h-12 print:text-3xl"></div>
+                <div key={i} className="w-14 h-14 border-b-3 border-slate-700 flex items-end justify-center text-4xl font-bold print:w-12 print:h-12 print:text-3xl pb-1"></div>
               ))}
             </div>
           </div>

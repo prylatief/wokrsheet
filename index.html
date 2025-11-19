@@ -43,12 +43,21 @@
 
       /* Ensure answer lines render well in PDF exports - using pt units */
       .answer-line {
-        border-bottom-width: 2.5pt;
+        border-bottom-width: 2pt;
         border-bottom-style: solid;
+        border-bottom-color: #4b5563;
         display: inline-block;
         vertical-align: baseline;
         margin-left: 0.5rem;
-        margin-bottom: -1px;
+        height: 1em;
+        line-height: 1;
+      }
+
+      /* Utility class for baseline alignment of answer lines in exercises */
+      .align-baseline {
+        vertical-align: baseline;
+        height: 1.2em;
+        line-height: 1;
       }
 
       /* Ensure dotted borders render well in PDF - using solid borders for consistency */
