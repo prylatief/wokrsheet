@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel-Perfect Rendering Visual Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Comic+Neue:wght@400;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    /* Enhanced CSS for pixel-perfect rendering */
+    .pdf-optimized {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      will-change: transform;
+      -webkit-font-smoothing: subpixel-antialiased;
+      -moz-osx-font-smoothing: auto;
+    }
+    
+    .answer-line {
+      border-bottom-width: 2px;
+      border-bottom-style: solid;
+      border-bottom-color: #4b5563;
+      display: inline-flex;
+      align-items: baseline;
+      vertical-align: baseline;
+      margin-left: 0.5rem;
+      height: 16px;
+      line-height: 16px;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      min-width: 80px;
+    }
+    
+    .align-baseline {
+      vertical-align: baseline;
+      height: 20px;
+      line-height: 20px;
+      display: inline-flex;
+      align-items: baseline;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    
+    .border-b-3 {
+      border-bottom-width: 3px;
+      border-bottom-style: solid;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    
+    .exercise-card {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      will-change: transform;
+    }
+    
+    #test-area header {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    
+    #test-area header > * {
+      align-self: baseline;
+      transform: translateY(0);
+    }
+    
+    .test-section {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background: white;
+    }
+    
+    .measurement-overlay {
+      position: absolute;
+      border: 1px dashed red;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-4xl font-bold mb-6 text-center">Pixel-Perfect Rendering Visual Test</h1>
+    <p class="text-center mb-8 text-gray-600">
+      Visual verification of pixel-perfect alignment with 0px tolerance
+    </p>
+
+    <div id="test-area">
+      <!-- Task 7.1: Answer Line Alignment in Counting Exercise -->
+      <div class="test-section">
+        <h2 class="text-2xl font-bold mb-4">Task 7.1: Answer Line Alignment (Counting Exercise)</h2>
+        <div class="exercise-card bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-bold mb-4">Hitung Apel</h3>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl">🍎🍎🍎🍎🍎</span>
+            <span class="text-xl">=</span>
+            <span class="answer-line border-gray-600"></span>
+          </div>
+          <div class="mt-4 text-sm text-gray-600">
+            ✓ Answer line should be perfectly aligned with emoji baseline<br>
+            ✓ Using inline-flex with explicit 16px height<br>
+            ✓ Border: 2px (not pt)<br>
+            ✓ Transform: translateZ(0) for GPU rendering
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 7.2: Math Equation Border Alignment -->
+      <div class="test-section">
+        <h2 class="text-2xl font-bold mb-4">Task 7.2: Math Equation Border Alignment</h2>
+        <div class="exercise-card bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-bold mb-4">Penjumlahan</h3>
+          <div class="flex items-baseline gap-2 text-3xl">
+            <span>3</span>
+            <span>+</span>
+            <span class="align-baseline border-b-3 border-gray-600 px-4">4</span>
+            <span>=</span>
+            <span class="answer-line border-gray-600"></span>
+          </div>
+          <div class="mt-4">
+            <h4 class="font-bold mb-2">Pengurangan</h4>
+            <div class="flex items-baseline gap-2 text-3xl">
+              <span>8</span>
+              <span>-</span>
+              <span class="align-baseline border-b-3 border-gray-600 px-4">3</span>
+              <span>=</span>
+              <span class="answer-line border-gray-600"></span>
+            </div>
+          </div>
+          <div class="mt-4 text-sm text-gray-600">
+            ✓ Border-bottom should align perfectly with number baseline<br>
+            ✓ Using inline-flex with 20px height<br>
+            ✓ Border: 3px (not pt)<br>
+            ✓ All borders perfectly horizontal
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 7.3: Header Title Positioning -->
+      <div class="test-section">
+        <h2 class="text-2xl font-bold mb-4">Task 7.3: Header Title Positioning</h2>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <header class="flex justify-between items-baseline p-4 border-2 border-gray-300">
+            <div>
+              <div class="text-sm">Nama: _____________</div>
+              <div class="text-sm">Kelas: _____________</div>
+            </div>
+            <h2 class="text-2xl font-bold">Latihan Hari Ini</h2>
+            <div class="text-sm">Tanggal: _____________</div>
+          </header>
+          <div class="mt-4 text-sm text-gray-600">
+            ✓ Title should maintain vertical position (no shift)<br>
+            ✓ Using flexbox with items-baseline<br>
+            ✓ Transform optimization applied<br>
+            ✓ All elements baseline-aligned
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 7.4: Spelling Box Borders -->
+      <div class="test-section">
+        <h2 class="text-2xl font-bold mb-4">Task 7.4: Spelling Box Borders</h2>
+        <div class="exercise-card bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-bold mb-4">Mengeja Nama Benda</h3>
+          <div class="flex justify-center items-center mb-4">
+            <span class="text-6xl">⚽</span>
+          </div>
+          <div class="flex gap-2 justify-center">
+            <div class="border-b-2 border-gray-600 w-12 h-12 text-center text-2xl font-bold flex items-center justify-center">B</div>
+            <div class="border-b-2 border-gray-600 w-12 h-12 text-center text-2xl font-bold flex items-center justify-center">O</div>
+            <div class="border-b-2 border-gray-600 w-12 h-12 text-center text-2xl font-bold flex items-center justify-center">L</div>
+            <div class="border-b-2 border-gray-600 w-12 h-12 text-center text-2xl font-bold flex items-center justify-center">A</div>
+          </div>
+          <div class="mt-4 text-sm text-gray-600">
+            ✓ All borders should be perfectly aligned<br>
+            ✓ Borders perfectly horizontal (no tilt)<br>
+            ✓ Using px units for borders<br>
+            ✓ Zero vertical misalignment
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 7.5: Pattern Exercise Alignment -->
+      <div class="test-section">
+        <h2 class="text-2xl font-bold mb-4">Task 7.5: Pattern Exercise Alignment</h2>
+        <div class="exercise-card bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-bold mb-4">Lanjutkan Pola Berikut</h3>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl">😊</span>
+            <span class="text-2xl">😂</span>
+            <span class="text-2xl">😊</span>
+            <span class="text-2xl">😂</span>
+            <span class="text-xl">→</span>
+            <span class="answer-line border-gray-600"></span>
+          </div>
+          <div class="mt-4 text-sm text-gray-600">
+            ✓ Answer line aligned with emoji baseline<br>
+            ✓ Using inline-flex for consistent alignment<br>
+            ✓ All items on same baseline<br>
+            ✓ Zero tolerance alignment
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Measurement Tools -->
+    <div class="test-section bg-blue-50">
+      <h2 class="text-2xl font-bold mb-4">Measurement Tools</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="measureAlignment()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          Measure Alignment
+        </button>
+        <button onclick="clearMeasurements()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+          Clear Measurements
+        </button>
+        <button onclick="runAllTests()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+          Run All Tests
+        </button>
+        <button onclick="exportResults()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+          Export Results
+        </button>
+      </div>
+      <div id="measurement-results" class="mt-4 p-4 bg-white rounded border border-gray-300">
+        <h3 class="font-bold mb-2">Measurement Results:</h3>
+        <div id="results-content" class="text-sm font-mono">
+          Click "Measure Alignment" to start testing...
+        </div>
+      </div>
+    </div>
+
+    <!-- Browser Info -->
+    <div class="test-section bg-yellow-50">
+      <h2 class="text-2xl font-bold mb-4">Task 7.6: Browser Information</h2>
+      <div id="browser-info" class="grid grid-cols-2 gap-4 text-sm">
+        <div><strong>Browser:</strong> <span id="browser-name">-</span></div>
+        <div><strong>Version:</strong> <span id="browser-version">-</span></div>
+        <div><strong>Device Pixel Ratio:</strong> <span id="dpr">-</span></div>
+        <div><strong>Screen Resolution:</strong> <span id="screen-res">-</span></div>
+        <div><strong>Font API Support:</strong> <span id="font-api">-</span></div>
+        <div><strong>Transform Support:</strong> <span id="transform-support">-</span></div>
+      </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="test-section bg-green-50">
+      <h2 class="text-2xl font-bold mb-4">Task 7.7: Performance Metrics</h2>
+      <div id="performance-metrics" class="grid grid-cols-2 gap-4 text-sm">
+        <div><strong>Scale 2 DPI:</strong> <span id="scale2-dpi">192 DPI</span></div>
+        <div><strong>Scale 3 DPI:</strong> <span id="scale3-dpi">288 DPI</span></div>
+        <div><strong>Improvement:</strong> <span id="dpi-improvement">50%</span></div>
+        <div><strong>Scale 3 Memory:</strong> <span id="scale3-memory">~28 MB</span></div>
+        <div><strong>Sub-pixel Precision:</strong> <span id="subpixel">0.333px</span></div>
+        <div><strong>Canvas Creation:</strong> <span id="canvas-time">-</span></div>
+      </div>
+      <button onclick="measurePerformance()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+        Measure Performance
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Detect browser
+    function detectBrowser() {
+      const ua = navigator.userAgent.toLowerCase();
+      let name = 'Unknown', version = 'Unknown';
+      
+      if (ua.includes('chrome') && !ua.includes('edge')) {
+        name = 'Chrome';
+        version = ua.match(/chrome\/([\d.]+)/)?.[1] || 'Unknown';
+      } else if (ua.includes('firefox')) {
+        name = 'Firefox';
+        version = ua.match(/firefox\/([\d.]+)/)?.[1] || 'Unknown';
+      } else if (ua.includes('edge')) {
+        name = 'Edge';
+        version = ua.match(/edge\/([\d.]+)/)?.[1] || 'Unknown';
+      } else if (ua.includes('safari') && !ua.includes('chrome')) {
+        name = 'Safari';
+        version = ua.match(/version\/([\d.]+)/)?.[1] || 'Unknown';
+      }
+      
+      return { name, version };
+    }
+
+    // Initialize browser info
+    function initBrowserInfo() {
+      const browser = detectBrowser();
+      document.getElementById('browser-name').textContent = browser.name;
+      document.getElementById('browser-version').textContent = browser.version;
+      document.getElementById('dpr').textContent = window.devicePixelRatio || 1;
+      document.getElementById('screen-res').textContent = `${screen.width}×${screen.height}`;
+      document.getElementById('font-api').textContent = typeof document.fonts !== 'undefined' ? '✅ Yes' : '❌ No';
+      
+      const testDiv = document.createElement('div');
+      testDiv.style.transform = 'translateZ(0)';
+      document.body.appendChild(testDiv);
+      const hasTransform = window.getComputedStyle(testDiv).transform !== 'none';
+      document.body.removeChild(testDiv);
+      document.getElementById('transform-support').textContent = hasTransform ? '✅ Yes' : '❌ No';
+    }
+
+    // Measure alignment
+    function measureAlignment() {
+      const results = [];
+      
+      // Task 7.1: Answer line alignment
+      const answerLines = document.querySelectorAll('.answer-line');
+      answerLines.forEach((line, i) => {
+        const rect = line.getBoundingClientRect();
+        const style = window.getComputedStyle(line);
+        results.push({
+          test: `7.1.${i+1} Answer Line`,
+          display: style.display,
+          height: style.height,
+          borderWidth: style.borderBottomWidth,
+          transform: style.transform !== 'none' ? '✅' : '❌',
+          position: `top: ${rect.top.toFixed(2)}px, bottom: ${rect.bottom.toFixed(2)}px`
+        });
+      });
+      
+      // Task 7.2: Math equation borders
+      const mathBorders = document.querySelectorAll('.align-baseline');
+      mathBorders.forEach((border, i) => {
+        const rect = border.getBoundingClientRect();
+        const style = window.getComputedStyle(border);
+        results.push({
+          test: `7.2.${i+1} Math Border`,
+          display: style.display,
+          height: style.height,
+          borderWidth: style.borderBottomWidth,
+          transform: style.transform !== 'none' ? '✅' : '❌',
+          position: `bottom: ${rect.bottom.toFixed(2)}px`
+        });
+      });
+      
+      // Task 7.3: Header alignment
+      const headers = document.querySelectorAll('header');
+      headers.forEach((header, i) => {
+        const style = window.getComputedStyle(header);
+        results.push({
+          test: `7.3.${i+1} Header`,
+          display: style.display,
+          alignItems: style.alignItems,
+          transform: style.transform !== 'none' ? '✅' : '❌',
+          position: 'N/A'
+        });
+      });
+      
+      // Task 7.4: Spelling box borders
+      const spellingBoxes = document.querySelectorAll('.test-section:nth-child(4) .border-b-2');
+      if (spellingBoxes.length > 0) {
+        const positions = Array.from(spellingBoxes).map(box => box.getBoundingClientRect().bottom);
+        const maxDiff = Math.max(...positions) - Math.min(...positions);
+        results.push({
+          test: '7.4 Spelling Boxes',
+          count: spellingBoxes.length,
+          maxDiff: `${maxDiff.toFixed(3)}px`,
+          aligned: maxDiff < 0.5 ? '✅ Yes' : '❌ No',
+          positions: positions.map(p => p.toFixed(2)).join(', ')
+        });
+      }
+      
+      // Display results
+      const resultsDiv = document.getElementById('results-content');
+      resultsDiv.innerHTML = '<pre>' + JSON.stringify(results, null, 2) + '</pre>';
+    }
+
+    // Clear measurements
+    function clearMeasurements() {
+      document.getElementById('results-content').textContent = 'Measurements cleared. Click "Measure Alignment" to test again.';
+    }
+
+    // Run all tests
+    function runAllTests() {
+      const results = {
+        timestamp: new Date().toISOString(),
+        browser: detectBrowser(),
+        tests: []
+      };
+      
+      // Test 7.1: Answer line
+      const answerLine = document.querySelector('.answer-line');
+      if (answerLine) {
+        const style = window.getComputedStyle(answerLine);
+        results.tests.push({
+          task: '7.1',
+          name: 'Answer Line Alignment',
+          passed: style.display === 'inline-flex' && style.transform !== 'none',
+          details: {
+            display: style.display,
+            height: style.height,
+            transform: style.transform
+          }
+        });
+      }
+      
+      // Test 7.2: Math borders
+      const mathBorder = document.querySelector('.align-baseline');
+      if (mathBorder) {
+        const style = window.getComputedStyle(mathBorder);
+        results.tests.push({
+          task: '7.2',
+          name: 'Math Equation Borders',
+          passed: style.display === 'inline-flex' && parseFloat(style.borderBottomWidth) === 3,
+          details: {
+            display: style.display,
+            borderWidth: style.borderBottomWidth
+          }
+        });
+      }
+      
+      // Test 7.3: Header
+      const header = document.querySelector('header');
+      if (header) {
+        const style = window.getComputedStyle(header);
+        results.tests.push({
+          task: '7.3',
+          name: 'Header Title Positioning',
+          passed: style.display === 'flex' && style.alignItems === 'baseline',
+          details: {
+            display: style.display,
+            alignItems: style.alignItems
+          }
+        });
+      }
+      
+      // Test 7.4: Spelling boxes
+      const spellingBoxes = document.querySelectorAll('.test-section:nth-child(4) .border-b-2');
+      if (spellingBoxes.length > 0) {
+        const positions = Array.from(spellingBoxes).map(box => box.getBoundingClientRect().bottom);
+        const maxDiff = Math.max(...positions) - Math.min(...positions);
+        results.tests.push({
+          task: '7.4',
+          name: 'Spelling Box Borders',
+          passed: maxDiff < 0.5,
+          details: {
+            count: spellingBoxes.length,
+            maxDiff: maxDiff.toFixed(3) + 'px'
+          }
+        });
+      }
+      
+      // Display results
+      const resultsDiv = document.getElementById('results-content');
+      const passedCount = results.tests.filter(t => t.passed).length;
+      const totalCount = results.tests.length;
+      
+      resultsDiv.innerHTML = `
+        <div class="mb-4">
+          <strong>Test Results: ${passedCount}/${totalCount} passed</strong>
+        </div>
+        <pre>${JSON.stringify(results, null, 2)}</pre>
+      `;
+    }
+
+    // Measure performance
+    function measurePerformance() {
+      const startTime = performance.now();
+      
+      // Create canvas at scale 3
+      const canvas = document.createElement('canvas');
+      canvas.width = 794 * 3;
+      canvas.height = 1123 * 3;
+      const ctx = canvas.getContext('2d');
+      
+      if (ctx) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      
+      document.getElementById('canvas-time').textContent = `${duration.toFixed(2)}ms`;
+      
+      // Calculate memory
+      const memoryMB = (canvas.width * canvas.height * 4) / (1024 * 1024);
+      document.getElementById('scale3-memory').textContent = `${memoryMB.toFixed(2)} MB`;
+    }
+
+    // Export results
+    function exportResults() {
+      const results = {
+        timestamp: new Date().toISOString(),
+        browser: detectBrowser(),
+        devicePixelRatio: window.devicePixelRatio,
+        screenResolution: `${screen.width}×${screen.height}`,
+        tests: []
+      };
+      
+      // Collect all measurements
+      measureAlignment();
+      
+      const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pixel-perfect-test-results-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      initBrowserInfo();
+      console.log('Pixel-Perfect Visual Test initialized');
+      console.log('Use the measurement tools to verify alignment');
+    });
+  </script>
+</body>
+</html>

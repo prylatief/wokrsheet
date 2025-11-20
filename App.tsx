@@ -598,14 +598,148 @@ const MainApp: React.FC = () => {
       await document.fonts.ready;
     }
 
-    // Additional wait to ensure fonts are fully rendered
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Explicitly check for critical fonts
+    const criticalFonts = ['Poppins', 'Comic Neue', 'Amiri'];
+    const fontChecks = criticalFonts.map(async (fontFamily) => {
+      try {
+        await document.fonts.load(`16px "${fontFamily}"`);
+        await document.fonts.load(`bold 16px "${fontFamily}"`);
+      } catch (e) {
+        console.warn(`Font ${fontFamily} may not be loaded:`, e);
+      }
+    });
 
-    // Force a reflow to ensure all text is rendered with correct fonts
+    await Promise.all(fontChecks);
+
+    // Extended wait for Arabic font rendering (Amiri needs more time)
+    await new Promise(resolve => setTimeout(resolve, 500)); // Increased from 300ms
+
+    // Force multiple reflows to ensure complete rendering
     const printableArea = document.getElementById('printable-area');
     if (printableArea) {
-      printableArea.offsetHeight; // Force reflow
+      printableArea.offsetHeight; // Force reflow 1
+      await new Promise(resolve => setTimeout(resolve, 50));
+      printableArea.offsetHeight; // Force reflow 2
+      await new Promise(resolve => setTimeout(resolve, 50));
+      printableArea.offsetHeight; // Force reflow 3
     }
+
+    // Additional wait for GPU rendering to complete
+    await new Promise(resolve => requestAnimationFrame(() => {
+      requestAnimationFrame(resolve);
+    }));
+  };
+
+  // Pre-render optimization function to add pdf-optimized class and force integer positioning
+  const optimizeForPdfRendering = (element: HTMLElement): void => {
+    // Add pdf-optimized class to the main element
+    element.classList.add('pdf-optimized');
+    
+    // Optimize all child elements
+    const allElements = element.querySelectorAll('*');
+    allElements.forEach((el) => {
+      if (el instanceof HTMLElement) {
+        el.classList.add('pdf-optimized');
+        
+        // Force integer positioning for elements with borders
+        const computedStyle = window.getComputedStyle(el);
+        if (computedStyle.borderBottomWidth && computedStyle.borderBottomWidth !== '0px') {
+          el.style.transform = 'translateZ(0)';
+          el.style.backfaceVisibility = 'hidden';
+        }
+      }
+    });
+    
+    // Force reflow after optimization
+    element.offsetHeight;
+  };
+
+  // Cleanup function to remove pdf-optimized class and inline styles
+  const cleanupPdfOptimization = (element: HTMLElement): void => {
+    // Remove pdf-optimized class from main element
+    element.classList.remove('pdf-optimized');
+    
+    // Remove pdf-optimized class from all children
+    const allElements = element.querySelectorAll('.pdf-optimized');
+    allElements.forEach((el) => {
+      el.classList.remove('pdf-optimized');
+    });
+    
+    // Cleanup inline styles that were added
+    const elementsWithInlineStyles = element.querySelectorAll('[style*="transform"][style*="translateZ"]');
+    elementsWithInlineStyles.forEach((el) => {
+      if (el instanceof HTMLElement) {
+        // Only remove the specific styles we added, preserve others
+        if (el.style.transform === 'translateZ(0)') {
+          el.style.transform = '';
+        }
+        if (el.style.backfaceVisibility === 'hidden') {
+          el.style.backfaceVisibility = '';
+        }
+      }
+    });
+  };
+
+  // Rendering validation function to check if content is ready for PDF capture
+  const validateRendering = async (element: HTMLElement): Promise<{ isValid: boolean; issues: string[] }> => {
+    const issues: string[] = [];
+
+    // Check if all fonts are loaded
+    if (document.fonts) {
+      if (document.fonts.status !== 'loaded') {
+        issues.push('Font belum sepenuhnya dimuat. Tunggu sebentar...');
+      }
+
+      // Check for critical fonts
+      const criticalFonts = ['Poppins', 'Comic Neue', 'Amiri'];
+      for (const fontFamily of criticalFonts) {
+        const fontLoaded = document.fonts.check(`16px "${fontFamily}"`);
+        if (!fontLoaded) {
+          issues.push(`Font ${fontFamily} belum dimuat dengan sempurna.`);
+        }
+      }
+    } else {
+      issues.push('Browser tidak mendukung Font Loading API. Hasil mungkin tidak optimal.');
+    }
+
+    // Check if element has proper dimensions
+    const rect = element.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      issues.push('Elemen memiliki dimensi nol. Konten mungkin belum di-render dengan benar.');
+    }
+
+    // Check if element is visible
+    const computedStyle = window.getComputedStyle(element);
+    if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') {
+      issues.push('Elemen tidak terlihat. Pastikan konten ditampilkan dengan benar.');
+    }
+
+    // Check if all images are loaded
+    const images = element.querySelectorAll('img');
+    const imageChecks = Array.from(images).map((img) => {
+      return img.complete && img.naturalHeight !== 0;
+    });
+
+    const unloadedImages = imageChecks.filter(check => !check).length;
+    if (unloadedImages > 0) {
+      issues.push(`${unloadedImages} gambar belum dimuat dengan sempurna.`);
+    }
+
+    // Check for SVG elements (common in coloring/maze exercises)
+    const svgs = element.querySelectorAll('svg');
+    if (svgs.length > 0) {
+      svgs.forEach((svg, index) => {
+        const svgRect = svg.getBoundingClientRect();
+        if (svgRect.width === 0 || svgRect.height === 0) {
+          issues.push(`SVG #${index + 1} belum di-render dengan benar.`);
+        }
+      });
+    }
+
+    return {
+      isValid: issues.length === 0,
+      issues
+    };
   };
 
   const handleExportPdf = async (
@@ -712,6 +846,47 @@ const MainApp: React.FC = () => {
         await new Promise(resolve => setTimeout(resolve, 300));
         await waitForFonts();
 
+        // Apply pre-render optimization
+        optimizeForPdfRendering(printableArea);
+
+        // Additional wait for GPU rendering after optimization
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Validate rendering before capture
+        const validation = await validateRendering(printableArea);
+        if (!validation.isValid) {
+          // Show warning with option to retry or continue
+          const issuesList = validation.issues.join('\n• ');
+          const userChoice = confirm(
+            `Peringatan untuk halaman ${pageNum}:\n\n• ${issuesList}\n\n` +
+            `Klik OK untuk mencoba lagi setelah menunggu lebih lama, atau Cancel untuk melanjutkan tanpa menunggu.`
+          );
+
+          if (userChoice) {
+            // User chose to retry - wait longer and validate again
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await waitForFonts();
+            
+            const retryValidation = await validateRendering(printableArea);
+            if (!retryValidation.isValid) {
+              // Still has issues, but continue anyway with a warning
+              const continueAnyway = confirm(
+                `Masih ada masalah setelah mencoba lagi:\n\n• ${retryValidation.issues.join('\n• ')}\n\n` +
+                `Lanjutkan membuat PDF? Hasil mungkin tidak sempurna.`
+              );
+              
+              if (!continueAnyway) {
+                // User chose to cancel
+                cleanupPdfOptimization(printableArea);
+                setCurrentPage(originalPage);
+                setIsDownloading(false);
+                return;
+              }
+            }
+          }
+          // If user clicked Cancel, continue without retrying
+        }
+
         // Update progress for rendering
         setDownloadProgress(Math.floor(20 + (i * progressPerPage * 0.3)));
 
@@ -720,16 +895,31 @@ const MainApp: React.FC = () => {
         try {
           canvas = await Promise.race([
             window.html2canvas(printableArea, {
-              scale: 2, // Reduced from 3 to 2 for more stable border rendering
+              scale: 3, // Increased from 2 to 3 for better precision
               useCORS: true,
               allowTaint: true,
               backgroundColor: '#ffffff',
-              letterRendering: false, // Disabled to prevent sub-pixel text shifts
+              letterRendering: true, // Changed to true for better text rendering
               logging: false,
               imageTimeout: 15000, // 15 second timeout for images
               removeContainer: true,
               windowWidth: printableArea.scrollWidth,
               windowHeight: printableArea.scrollHeight,
+              foreignObjectRendering: false, // Disable for better border rendering
+              onclone: (clonedDoc) => {
+                // Force pixel-perfect rendering in cloned document
+                const clonedArea = clonedDoc.getElementById('printable-area');
+                if (clonedArea) {
+                  // Force reflow and repaint
+                  clonedArea.style.transform = 'translateZ(0)';
+                  clonedArea.offsetHeight; // Force reflow
+                  
+                  // Ensure all fonts are loaded in cloned document
+                  if (clonedDoc.fonts && clonedDoc.fonts.ready) {
+                    return clonedDoc.fonts.ready;
+                  }
+                }
+              },
             }),
             // Timeout after 30 seconds
             new Promise((_, reject) => 
@@ -738,6 +928,9 @@ const MainApp: React.FC = () => {
           ]);
         } catch (canvasError) {
           throw new Error(`Gagal menangkap tampilan halaman ${pageNum}: ${canvasError instanceof Error ? canvasError.message : String(canvasError)}`);
+        } finally {
+          // Cleanup optimization after capture (whether successful or not)
+          cleanupPdfOptimization(printableArea);
         }
 
         // Validate canvas result

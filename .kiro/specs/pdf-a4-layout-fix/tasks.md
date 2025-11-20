@@ -91,7 +91,8 @@
     - Ensure text tidak terlalu kecil atau besar untuk A4 format
     - _Requirements: 5.4, 6.3, 6.4_
 
-- [-] 6. Add error handling dan validation untuk A4 compliance
+- [ ] 6. Add error handling dan validation untuk A4 compliance
+
 
 
 
@@ -119,6 +120,8 @@
     - Test dengan berbagai printer untuk margin compatibility
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
   
+
+
   - [x] 7.2 Test layout consistency antara preview dan PDF
 
 
