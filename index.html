@@ -367,6 +367,147 @@
       }
 
       /* Ensure consistent dimensions across all screen sizes */
+      /* ============================================
+         PDF MODE STYLES - For html2canvas capture
+         ============================================ */
+
+      /* PDF Mode: Activated when generating PDF to ensure stable, pixel-perfect rendering */
+      .pdf-mode {
+        /* Force white background, no fancy themes */
+        background: #ffffff !important;
+        background-image: none !important;
+      }
+
+      /* Remove all shadows in PDF mode */
+      .pdf-mode,
+      .pdf-mode * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+      }
+
+      /* Simplify rounded corners for better PDF rendering */
+      .pdf-mode .exercise-card {
+        border-radius: 8px !important; /* Simplified from rounded-xl */
+      }
+
+      .pdf-mode .rounded-xl,
+      .pdf-mode .rounded-2xl {
+        border-radius: 8px !important;
+      }
+
+      .pdf-mode .rounded-lg {
+        border-radius: 6px !important;
+      }
+
+      .pdf-mode .rounded-full {
+        border-radius: 50% !important; /* Keep circles as circles */
+      }
+
+      /* Replace gradients with solid colors in PDF mode */
+
+      /* Exercise cards: gradient-to-br from-yellow-50 to-orange-50 → solid pastel yellow */
+      .pdf-mode .exercise-card {
+        background: #fef9e7 !important; /* Solid light yellow */
+        border: 2px solid #f8b400 !important; /* Solid orange border */
+      }
+
+      /* Title header: gradient-to-r from-purple-500 via-pink-500 to-orange-400 → solid purple */
+      .pdf-mode .bg-gradient-to-r.from-purple-500 {
+        background: #9333ea !important; /* Solid purple */
+        background-image: none !important;
+      }
+
+      /* Juz Amma boxes: gradient-to-r from-green-50 to-emerald-50 → solid light green */
+      .pdf-mode .bg-gradient-to-r.from-green-50 {
+        background: #f0fdf4 !important; /* Solid light green */
+        background-image: none !important;
+      }
+
+      /* Color coding boxes: various bg colors → keep as is (already solid) */
+      .pdf-mode .bg-blue-50 {
+        background: #eff6ff !important;
+        background-image: none !important;
+      }
+
+      .pdf-mode .bg-purple-50 {
+        background: #faf5ff !important;
+        background-image: none !important;
+      }
+
+      .pdf-mode .bg-green-100 {
+        background: #dcfce7 !important;
+        background-image: none !important;
+      }
+
+      .pdf-mode .bg-slate-50\/50,
+      .pdf-mode .bg-slate-50 {
+        background: #f8fafc !important;
+        background-image: none !important;
+      }
+
+      /* Remove decorative pseudo-elements that may cause rendering issues */
+      .pdf-mode .border-flowers::before,
+      .pdf-mode .border-hearts::before,
+      .pdf-mode .border-animals::before,
+      .pdf-mode .border-clouds::before,
+      .pdf-mode .border-music::before {
+        display: none !important; /* Hide emoji decorations for stability */
+      }
+
+      /* Simplify borders to solid colors in PDF mode */
+      .pdf-mode .border-rainbow {
+        border: 8px solid #9333ea !important; /* Solid purple instead of rainbow gradient */
+        background-image: none !important;
+      }
+
+      .pdf-mode .border-geometric {
+        border: 8px solid #3b82f6 !important; /* Keep solid blue */
+        background-image: none !important; /* Remove diagonal patterns */
+      }
+
+      /* Ensure all text renders with subpixel antialiasing OFF for crisp PDF text */
+      .pdf-mode,
+      .pdf-mode * {
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
+        text-rendering: geometricPrecision !important;
+      }
+
+      /* Force GPU rendering for stable positioning */
+      .pdf-mode .exercise-card,
+      .pdf-mode .answer-line,
+      .pdf-mode .border-b-3,
+      .pdf-mode .align-baseline {
+        transform: translateZ(0) !important;
+        backface-visibility: hidden !important;
+      }
+
+      /* Ensure explicit pixel heights for all interactive elements */
+      .pdf-mode .answer-line {
+        height: 16px !important;
+        line-height: 16px !important;
+      }
+
+      .pdf-mode .align-baseline {
+        height: 20px !important;
+        line-height: 20px !important;
+      }
+
+      /* Disable animations in PDF mode */
+      .pdf-mode,
+      .pdf-mode * {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      /* Force color preservation in PDF */
+      .pdf-mode,
+      .pdf-mode * {
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
       @media screen {
         #printable-area {
           max-width: 210mm;

@@ -632,15 +632,18 @@ const MainApp: React.FC = () => {
 
   // Pre-render optimization function to add pdf-optimized class and force integer positioning
   const optimizeForPdfRendering = (element: HTMLElement): void => {
+    // Add pdf-mode class for stable rendering (Solusi 3: separate web vs PDF UI)
+    element.classList.add('pdf-mode');
+
     // Add pdf-optimized class to the main element
     element.classList.add('pdf-optimized');
-    
+
     // Optimize all child elements
     const allElements = element.querySelectorAll('*');
     allElements.forEach((el) => {
       if (el instanceof HTMLElement) {
         el.classList.add('pdf-optimized');
-        
+
         // Force integer positioning for elements with borders
         const computedStyle = window.getComputedStyle(el);
         if (computedStyle.borderBottomWidth && computedStyle.borderBottomWidth !== '0px') {
@@ -649,22 +652,25 @@ const MainApp: React.FC = () => {
         }
       }
     });
-    
+
     // Force reflow after optimization
     element.offsetHeight;
   };
 
   // Cleanup function to remove pdf-optimized class and inline styles
   const cleanupPdfOptimization = (element: HTMLElement): void => {
+    // Remove pdf-mode class (Solusi 3: restore web UI after PDF generation)
+    element.classList.remove('pdf-mode');
+
     // Remove pdf-optimized class from main element
     element.classList.remove('pdf-optimized');
-    
+
     // Remove pdf-optimized class from all children
     const allElements = element.querySelectorAll('.pdf-optimized');
     allElements.forEach((el) => {
       el.classList.remove('pdf-optimized');
     });
-    
+
     // Cleanup inline styles that were added
     const elementsWithInlineStyles = element.querySelectorAll('[style*="transform"][style*="translateZ"]');
     elementsWithInlineStyles.forEach((el) => {
